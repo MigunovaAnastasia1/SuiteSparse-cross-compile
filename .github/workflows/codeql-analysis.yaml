@@ -2,9 +2,9 @@ name: "CodeQL"
 
 on:
   workflow_dispatch:
-  schedule:
+  # schedule:
     # Run job every Saturday at 10:20 UTC
-    - cron: '20 10 * * 6'
+    # - cron: '20 10 * * 6'
 
 concurrency: codeql-${{ github.ref }}
 

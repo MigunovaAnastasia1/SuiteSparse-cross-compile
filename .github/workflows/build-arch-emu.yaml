@@ -1,11 +1,11 @@
 name: arch-emu
 on:
   workflow_dispatch:
-  push:
-    branches-ignore:
-      - '**/dev2'
-      - '**/*dev2'
-  pull_request:
+  # push:
+  #  branches-ignore:
+  #    - '**/dev2'
+  #    - '**/*dev2'
+  # pull_request:
 
 concurrency: ci-arch-emu-${{ github.ref }}
 
@@ -73,11 +73,9 @@ jobs:
             ccache
             cmake
             gfortran
-            # m4
             gmp-dev
             mpfr-dev
             lapack-dev
-            # python3
             util-linux-misc
             autoconf
             automake
