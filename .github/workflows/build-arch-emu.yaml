@@ -29,8 +29,8 @@ jobs:
         shell: alpine.sh {0}
 
     strategy:
-      # Allow other runners in the matrix to continue if some fail
-      fail-fast: false
+      # Doesn't allow other runners in the matrix to continue if some fail, draft change for experimentation
+      fail-fast: true
 
       matrix:
         # For available CPU architectures, see:
@@ -73,11 +73,11 @@ jobs:
             ccache
             cmake
             gfortran
-            m4
+            # m4
             gmp-dev
             mpfr-dev
             lapack-dev
-            python3
+            # python3
             util-linux-misc
             autoconf
             automake
