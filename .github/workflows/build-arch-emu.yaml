@@ -37,6 +37,7 @@ jobs:
         # https://github.com/marketplace/actions/setup-alpine-linux-environment
         # arch: [x86, aarch64, armv7, ppc64le, s390x, riscv64]
 	arch: [x86, aarch64]
+
         include:
           - arch: x86
             ccache-max: 64M
