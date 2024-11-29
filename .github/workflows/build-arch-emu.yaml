@@ -68,6 +68,8 @@ jobs:
       - name: install cross-toolchain
         # shell: bash
         run: |
+          if [[ ${{ matrix.arch }} != 'x86' ]]
+          then
           echo "::group::Install Aptitude"
           sudo apt install aptitude 
           echo "::endgroup::"
@@ -91,6 +93,7 @@ jobs:
           fi
           fi
           echo "::endgroup::"
+          fi
 
 
       - name: install dependencies
