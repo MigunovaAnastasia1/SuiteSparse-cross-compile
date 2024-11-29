@@ -76,7 +76,7 @@ jobs:
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
           if [[ ${{ matrix.arch }} = 'aarch64' || ${{ matrix.arch }} = 'riscv64' ]]
           then
-          sudo aptitude -y  install gcc-10-$TARGET_ARCH-linux-gnu
+          sudo aptitude -y  install gcc-10-${{ matrix.arch }}-linux-gnu
           else 
           if [[ ${{ matrix.arch }} = 'armv7' ]]
           then
