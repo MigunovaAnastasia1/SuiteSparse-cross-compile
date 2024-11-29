@@ -91,7 +91,6 @@ jobs:
           fi
           fi 
           fi
-          fi
           echo "::endgroup::"
           else 
           echo "target architecture ${{ matrix.arch }} does not require installation"
