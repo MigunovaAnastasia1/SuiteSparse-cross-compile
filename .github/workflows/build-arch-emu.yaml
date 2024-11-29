@@ -64,6 +64,35 @@ jobs:
         uses: actions/checkout@v4
         # shell: bash
 
+        # new step
+      - name: install cross-toolchain
+        # shell: bash
+        run: |
+          echo "::group::Install Aptitude"
+          sudo apt install aptitude 
+          echo "::endgroup::"
+          echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
+          if [[ ${{ matrix.arch }} = 'aarch64' || ${{ matrix.arch }} = 'riscv64' ]]
+          then
+          sudo aptitude -y  install gcc-10-$TARGET_ARCH-linux-gnu
+          else 
+          if [[ ${{ matrix.arch }} = 'armv7' ]]
+          then
+          # case for armv7, можно с помощью ct-ng собрать
+          echo "nothing"
+          else
+          if [[ ${{ matrix.arch }} = 'ppc64le' ]] 
+          then
+          sudo aptitude -y install  gcc-10-powerpc64le-linux-gnu  
+          else 
+          sudo aptitude -y  install gcc-10-multilib-s390x-linux-gnu
+          fi
+          fi 
+          fi
+          fi
+          echo "::endgroup::"
+
+
       - name: install dependencies
         uses: jirutka/setup-alpine@v1
         # shell: bash
