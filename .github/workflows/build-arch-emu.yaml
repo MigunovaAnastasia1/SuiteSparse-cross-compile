@@ -1,7 +1,7 @@
 name: arch-emu
 on:
   workflow_dispatch:
-  # push:
+  push:
   #  branches-ignore:
   #    - '**/dev2'
   #    - '**/*dev2'
@@ -93,6 +93,8 @@ jobs:
           fi
           fi
           echo "::endgroup::"
+          else 
+          echo "target architecture ${{ matrix.arch }} does not require installation"
           fi
 
 
