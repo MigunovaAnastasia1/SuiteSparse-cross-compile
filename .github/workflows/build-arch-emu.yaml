@@ -155,7 +155,7 @@ jobs:
           TARGET_ARCH: ${{ matrix.arch }}
           CROSS_SYSROOT: "/home/runner/rootfs/alpine-latest-${{ matrix.arch }}"
         run: |
-          ls $CROSS_SYSROOT
+          ls $CROSS_SYSROOT/usr/local/lib
           echo "gcc --version"
           gcc --version
           echo "gcc -dumpmachine"
