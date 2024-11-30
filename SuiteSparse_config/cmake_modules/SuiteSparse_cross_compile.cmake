@@ -2,13 +2,13 @@
 set(CMAKE_SYSTEM_NAME Linux)
 
 # which compilers to use for C and C++
-if ( $ENV{TARGET_ARCH} "aarch64" OR $ENV{TARGET_ARCH} "riscv64" )
+if ( $ENV{TARGET_ARCH} EQUAL "aarch64" OR $ENV{TARGET_ARCH} EQUAL"riscv64" )
     set(CMAKE_C_COMPILER   "${TARGET_ARCH}-linux-gnu-gcc-10")
     set(CMAKE_CXX_COMPILER   "${TARGET_ARCH}-linux-gnu-g++-9")
-elseif ( $ENV{TARGET_ARCH} "ppc64le" )
+elseif ( $ENV{TARGET_ARCH} EQUAL "ppc64le" )
     set(CMAKE_C_COMPILER   "powerpc64le-linux-gnu-gcc-10")
     set(CMAKE_CXX_COMPILER   "powerpc64le-linux-gnu-g++-9")
-elseif ( $ENV{TARGET_ARCH} "x86" )
+elseif ( $ENV{TARGET_ARCH} EQUAL "x86" )
     set(CMAKE_C_COMPILER   "gcc")
     set(CMAKE_CXX_COMPILER   "g++")
 else ( )
