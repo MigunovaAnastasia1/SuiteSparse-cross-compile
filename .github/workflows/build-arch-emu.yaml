@@ -26,7 +26,7 @@ jobs:
     defaults:
       run:
         # Use emulated shell as default
-        shell: alpine-target.sh {0}
+        shell: alpine-target.sh
 
     strategy:
       # Doesn't allow other runners in the matrix to continue if some fail, draft change for experimentation
@@ -106,13 +106,12 @@ jobs:
           volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
        
       - name: install cross-toolchain
-        shell: alpine.sh {0}
+        shell: alpine.sh 
         run: |
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
           echo "::group::Install Aptitude"
           sudo apt install aptitude
-          sudo apt install apt-cache 
           echo "::endgroup::"
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
           if [[ ${{ matrix.arch }} = 'aarch64' || ${{ matrix.arch }} = 'riscv64' ]]
@@ -171,9 +170,8 @@ jobs:
         env:
           TARGET_ARCH: ${{ matrix.arch }}
           CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
-        shell: alpine.sh {0}
+        shell: alpine.sh 
         run: |
-          apt-cache policy openblas-dev
           echo "gcc --version"
           gcc --version
           echo "gcc -dumpmachine"
