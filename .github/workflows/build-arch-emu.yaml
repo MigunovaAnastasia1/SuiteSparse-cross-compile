@@ -52,7 +52,9 @@ jobs:
             ccache-max: 28M
           - arch: riscv64
             ccache-max: 28M
-
+    
+    env:
+      CROSS_SYSROOT: /mnt/alpine-${{ matrix.os-arch }} # chroot for alpine x86_64 (build system)
     name: alpine (${{ matrix.arch }})
 
     steps:
@@ -64,9 +66,37 @@ jobs:
         uses: actions/checkout@v4
         # shell: bash
 
-        # new step
+      - name: install dependencies (target)
+        uses: jirutka/setup-alpine@v1
+        # shell: bash
+        with:
+          arch: ${{ matrix.arch }}
+          packages: >
+            build-base
+            ccache
+            cmake
+            gfortran
+            gmp-dev
+            mpfr-dev
+            lapack-dev
+            openblas-dev
+            util-linux-misc
+            autoconf
+            automake
+            libtool
+          # ${{ matrix.arch != 'riscv64' && 'valgrind' || '' }}
+          shell-name: alpine-target.sh
+
+      - name: get CPU information (emulated)
+        run: lscpu
+
+      -name: create build system
+       uses: jirutka/setup-alpine@v1
+       with:
+         arch: x86_64
+         volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
+       
       - name: install cross-toolchain
-        shell: bash
         run: |
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
@@ -95,30 +125,6 @@ jobs:
           else 
           echo "target architecture ${{ matrix.arch }} does not require installation"
           fi
-
-
-      - name: install dependencies
-        uses: jirutka/setup-alpine@v1
-        # shell: bash
-        with:
-          arch: ${{ matrix.arch }}
-          packages: >
-            build-base
-            ccache
-            cmake
-            gfortran
-            gmp-dev
-            mpfr-dev
-            lapack-dev
-            openblas-dev
-            util-linux-misc
-            autoconf
-            automake
-            libtool
-          # ${{ matrix.arch != 'riscv64' && 'valgrind' || '' }}
-
-      - name: get CPU information (emulated)
-        run: lscpu
 
       - name: prepare ccache
         # create key with human readable timestamp
@@ -151,14 +157,9 @@ jobs:
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
 
       - name: build
-        shell: bash
         env:
           TARGET_ARCH: ${{ matrix.arch }}
-          CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}
         run: |
-          ls ${CROSS_SYSROOT}/usr/local/lib
-          ls ${CROSS_SYSROOT}/usr/lib
-          ls ${CROSS_SYSROOT}/lib
           echo "gcc --version"
           gcc --version
           echo "gcc -dumpmachine"
