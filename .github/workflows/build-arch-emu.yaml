@@ -94,7 +94,6 @@ jobs:
       - name: create build system
         uses: jirutka/setup-alpine@v1
         with:
-          arch: x86
           packages: >
             build-base
             pkgconf
