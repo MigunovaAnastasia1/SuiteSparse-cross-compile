@@ -168,6 +168,7 @@ jobs:
       - name: build
         env:
           TARGET_ARCH: ${{ matrix.arch }}
+          CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
         shell: alpine.sh {0}
         run: |
           `gcc -print-prog-name=cpp` -v
