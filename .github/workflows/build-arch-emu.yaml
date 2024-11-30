@@ -96,6 +96,11 @@ jobs:
         with:
           packages: >
             build-base
+            ccache
+            cmake
+            autoconf
+            automake
+            libtool
             pkgconf
           volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
        
