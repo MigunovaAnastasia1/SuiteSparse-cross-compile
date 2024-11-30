@@ -153,7 +153,7 @@ jobs:
         shell: bash
         env:
           TARGET_ARCH: ${{ matrix.arch }}
-          CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}
+          CROSS_SYSROOT: "/home/runner/rootfs/alpine-latest-${{ matrix.arch }}"
         run: |
           echo "gcc --version"
           gcc --version
