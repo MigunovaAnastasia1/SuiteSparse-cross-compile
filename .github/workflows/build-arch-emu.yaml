@@ -111,7 +111,8 @@ jobs:
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
           echo "::group::Install Aptitude"
-          sudo apt install aptitude 
+          sudo apt install aptitude
+          sudo apt install apt-cache 
           echo "::endgroup::"
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
           if [[ ${{ matrix.arch }} = 'aarch64' || ${{ matrix.arch }} = 'riscv64' ]]
@@ -172,7 +173,7 @@ jobs:
           CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
         shell: alpine.sh {0}
         run: |
-          `gcc -print-prog-name=cpp` -v
+          apt-cach policy openblas-dev
           echo "gcc --version"
           gcc --version
           echo "gcc -dumpmachine"
