@@ -25,8 +25,8 @@ jobs:
 
     defaults:
       run:
-        # Use build system shell as default
-        shell: alpine.sh {0}
+        # Use emulated shell as default
+        shell: alpine-target.sh {0}
 
     strategy:
       # Doesn't allow other runners in the matrix to continue if some fail, draft change for experimentation
@@ -89,7 +89,6 @@ jobs:
           shell-name: alpine-target.sh
 
       - name: get CPU information (emulated)
-        shell: alpine-target.sh {0}
         run: lscpu
 
       - name: create build system
@@ -101,6 +100,7 @@ jobs:
           volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
        
       - name: install cross-toolchain
+        shell: alpine.sh {0}
         run: |
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
@@ -163,6 +163,7 @@ jobs:
       - name: build
         env:
           TARGET_ARCH: ${{ matrix.arch }}
+        shell: alpine.sh {0}
         run: |
           echo "gcc --version"
           gcc --version
