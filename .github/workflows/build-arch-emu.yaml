@@ -1,7 +1,7 @@
 name: arch-emu
 on:
   workflow_dispatch:
-  push:
+  # push:
   #  branches-ignore:
   #    - '**/dev2'
   #    - '**/*dev2'
@@ -150,6 +150,10 @@ jobs:
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
 
       - name: build
+        shell: bush
+        env:
+          TARGET_ARCH  = ${{ matrix.arch }}
+          CROSS_SYSROOT = /home/runner/rootfs/alpine-latest-${{ matrix.arch }}
         run: |
           echo "gcc --version"
           gcc --version
@@ -161,7 +165,8 @@ jobs:
             printf "   \033[0;32m==>\033[0m Building library \033[0;32m${lib}\033[0m\n"
             echo "::group::Configure $lib"
             cd ${GITHUB_WORKSPACE}/${lib}/build
-            cmake -DCMAKE_BUILD_TYPE="Release" \
+            cmake -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}\SuiteSparse_config\cmake_modules\SuiteSparse_cross_compile.cmake \
+                  -DCMAKE_BUILD_TYPE="Release" \
                   -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}" \
                   -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
                   -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
@@ -178,6 +183,8 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
+
+      -name: 
 
       - name: check
         timeout-minutes: 60
