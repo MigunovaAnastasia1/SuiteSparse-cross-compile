@@ -152,8 +152,8 @@ jobs:
       - name: build
         shell: bush
         env:
-          TARGET_ARCH  = ${{ matrix.arch }}
-          CROSS_SYSROOT = /home/runner/rootfs/alpine-latest-${{ matrix.arch }}
+          TARGET_ARCH: ${{ matrix.arch }}
+          CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}
         run: |
           echo "gcc --version"
           gcc --version
