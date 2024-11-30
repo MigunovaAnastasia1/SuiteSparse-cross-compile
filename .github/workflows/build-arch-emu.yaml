@@ -104,7 +104,7 @@ jobs:
           arch: ${{ matrix.arch }}
           packages: >
             build-base
-	    valgrind
+            valgrind
             ccache
             cmake
             gfortran
