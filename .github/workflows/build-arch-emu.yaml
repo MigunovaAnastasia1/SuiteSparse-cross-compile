@@ -170,6 +170,7 @@ jobs:
           TARGET_ARCH: ${{ matrix.arch }}
         shell: alpine.sh {0}
         run: |
+          `gcc -print-prog-name=cpp` -v
           echo "gcc --version"
           gcc --version
           echo "gcc -dumpmachine"
