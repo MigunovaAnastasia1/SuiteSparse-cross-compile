@@ -150,10 +150,10 @@ jobs:
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
 
       - name: build
-        shell: bush
         env:
           TARGET_ARCH: ${{ matrix.arch }}
           CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}
+        shell: bush
         run: |
           echo "gcc --version"
           gcc --version
@@ -183,8 +183,6 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
-
-      -name: 
 
       - name: check
         timeout-minutes: 60
