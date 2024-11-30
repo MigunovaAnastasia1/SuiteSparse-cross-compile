@@ -76,7 +76,7 @@ jobs:
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
           if [[ ${{ matrix.arch }} = 'aarch64' || ${{ matrix.arch }} = 'riscv64' ]]
           then
-          sudo aptitude -y  install gcc-10-${{ matrix.arch }}-linux-gnu
+          sudo aptitude -y  install gcc-10-${{ matrix.arch }}-linux-gnu g++-9-${{ matrix.arch }}-linux-gnu
           else 
           if [[ ${{ matrix.arch }} = 'armv7' ]]
           then
@@ -85,9 +85,9 @@ jobs:
           else
           if [[ ${{ matrix.arch }} = 'ppc64le' ]] 
           then
-          sudo aptitude -y install  gcc-10-powerpc64le-linux-gnu  
+          sudo aptitude -y install  gcc-10-powerpc64le-linux-gnu g++-9-powerpc64le-linux-gnu 
           else 
-          sudo aptitude -y  install gcc-10-multilib-s390x-linux-gnu
+          sudo aptitude -y  install gcc-10-multilib-s390x-linux-gnu g++-9-s390x-linux-gnu
           fi
           fi 
           fi
