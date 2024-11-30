@@ -54,7 +54,7 @@ jobs:
             ccache-max: 28M
     
     env:
-      CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # chroot for alpine x86_64 (build system)
+      CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
     name: alpine (${{ matrix.arch }})
 
     steps:
@@ -67,6 +67,7 @@ jobs:
         # shell: bash
 
       - name: install dependencies (target)
+        id: alpine-target
         uses: jirutka/setup-alpine@v1
         # shell: bash
         with:
