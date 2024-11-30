@@ -54,7 +54,7 @@ jobs:
             ccache-max: 28M
     
     env:
-      CROSS_SYSROOT: /mnt/alpine-${{ matrix.os-arch }} # chroot for alpine x86_64 (build system)
+      CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # chroot for alpine x86_64 (build system)
     name: alpine (${{ matrix.arch }})
 
     steps:
