@@ -25,7 +25,7 @@ jobs:
 
     defaults:
       run:
-        # Use emulated shell as default
+        # Use build system shell as default
         shell: alpine.sh {0}
 
     strategy:
@@ -35,13 +35,13 @@ jobs:
       matrix:
         # For available CPU architectures, see:
         # https://github.com/marketplace/actions/setup-alpine-linux-environment
-        arch: [aarch64, ppc64le, s390x, riscv64]
+        arch: [x86, aarch64, ppc64le, s390x, riscv64]
         # arch: [x86, aarch64]
         include:
-         # - arch: x86
-          #  ccache-max: 64M
-          #  extra-build-libs: ":GraphBLAS:LAGraph"
-          #  extra-check-libs: ":GraphBLAS:LAGraph"
+          - arch: x86
+            ccache-max: 64M
+            extra-build-libs: ":GraphBLAS:LAGraph"
+            extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: aarch64
             ccache-max: 28M
           # - arch: armv7
@@ -94,7 +94,10 @@ jobs:
       - name: create build system
         uses: jirutka/setup-alpine@v1
         with:
-          arch: x86_64
+          arch: x86
+          packages: >
+            build-base
+            pkgconf
           volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
        
       - name: install cross-toolchain
