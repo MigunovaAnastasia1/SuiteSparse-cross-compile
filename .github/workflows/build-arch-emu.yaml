@@ -94,6 +94,7 @@ jobs:
         uses: jirutka/setup-alpine@v1
         with:
           packages: >
+            aptitude
             build-base
             ccache
             cmake
@@ -109,7 +110,6 @@ jobs:
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
           echo "::group::Install Aptitude"
-          apk add aptitude
           echo "::endgroup::"
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
           if [[ ${{ matrix.arch }} = 'aarch64' || ${{ matrix.arch }} = 'riscv64' ]]
