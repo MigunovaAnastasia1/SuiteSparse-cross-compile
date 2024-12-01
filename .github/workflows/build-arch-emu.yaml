@@ -30,18 +30,18 @@ jobs:
 
     strategy:
       # Doesn't allow other runners in the matrix to continue if some fail, draft change for experimentation
-      fail-fast: true
+      fail-fast: false
 
       matrix:
         # For available CPU architectures, see:
         # https://github.com/marketplace/actions/setup-alpine-linux-environment
-        arch: [x86, aarch64, ppc64le, s390x, riscv64]
+        arch: [aarch64, ppc64le, s390x, riscv64]
         # arch: [x86, aarch64]
         include:
-          - arch: x86
-            ccache-max: 64M
-            extra-build-libs: ":GraphBLAS:LAGraph"
-            extra-check-libs: ":GraphBLAS:LAGraph"
+          # - arch: x86
+          #  ccache-max: 64M
+          #  extra-build-libs: ":GraphBLAS:LAGraph"
+          #  extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: aarch64
             ccache-max: 28M
           # - arch: armv7
@@ -109,13 +109,12 @@ jobs:
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
           echo "::group::Install Aptitude"
-          sudo apt install aptitude
-          sudo apt install apt-cache 
+          apt install aptitude
           echo "::endgroup::"
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
           if [[ ${{ matrix.arch }} = 'aarch64' || ${{ matrix.arch }} = 'riscv64' ]]
           then
-          sudo aptitude -y  install gcc-10-${{ matrix.arch }}-linux-gnu g++-9-${{ matrix.arch }}-linux-gnu
+          aptitude -y  install gcc-10-${{ matrix.arch }}-linux-gnu g++-9-${{ matrix.arch }}-linux-gnu
           else 
           if [[ ${{ matrix.arch }} = 'armv7' ]]
           then
@@ -124,9 +123,9 @@ jobs:
           else
           if [[ ${{ matrix.arch }} = 'ppc64le' ]] 
           then
-          sudo aptitude -y install  gcc-10-powerpc64le-linux-gnu g++-9-powerpc64le-linux-gnu 
+          aptitude -y install  gcc-10-powerpc64le-linux-gnu g++-9-powerpc64le-linux-gnu 
           else 
-          sudo aptitude -y  install gcc-10-multilib-s390x-linux-gnu g++-9-s390x-linux-gnu
+          aptitude -y  install gcc-10-multilib-s390x-linux-gnu g++-9-s390x-linux-gnu
           fi
           fi 
           fi
