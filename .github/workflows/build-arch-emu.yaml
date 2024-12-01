@@ -109,7 +109,7 @@ jobs:
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
           echo "::group::Install Aptitude"
-          apt install aptitude
+          apk add aptitude
           echo "::endgroup::"
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
           if [[ ${{ matrix.arch }} = 'aarch64' || ${{ matrix.arch }} = 'riscv64' ]]
