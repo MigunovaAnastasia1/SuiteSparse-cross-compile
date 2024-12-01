@@ -97,14 +97,10 @@ jobs:
             build-base
             ccache
             cmake
-            gfortran
-            gmp-dev
-            mpfr-dev
-            lapack-dev
-            util-linux-misc
             autoconf
             automake
             libtool
+            pkgconf
           volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
        
       - name: install cross-toolchain
@@ -175,7 +171,12 @@ jobs:
           CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
         shell: alpine.sh {0}
         run: |
-          
+          echo "::group::Contants of ${CROSS_SYSROOT}/usr/lib"
+          ls ${CROSS_SYSROOT}/usr/lib 
+          echo "::endgroup::"
+          echo "::group::Contants of ${CROSS_SYSROOT}/lib"
+          ls ${CROSS_SYSROOT}/lib 
+          echo "::endgroup::"
           echo "gcc --version"
           gcc --version
           echo "gcc -dumpmachine"
