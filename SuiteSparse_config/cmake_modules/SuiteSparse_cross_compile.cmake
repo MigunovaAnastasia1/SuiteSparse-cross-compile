@@ -18,7 +18,7 @@ endif ( )
 
 # where is the target environment located
 set(CMAKE_FIND_ROOT_PATH $ENV{CROSS_SYSROOT})
-message("CMAKE_FIND_ROOT_PATH is $CMAKE_FIND_ROOT_PATH")
+message("CMAKE_FIND_ROOT_PATH is ${CMAKE_FIND_ROOT_PATH}")
 
 # adjust the default behavior of the FIND_XXX() commands:
 # search programs in the host environment
