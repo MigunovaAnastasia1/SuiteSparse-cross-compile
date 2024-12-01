@@ -188,6 +188,7 @@ jobs:
             echo "::group::Configure $lib"
             cd ${GITHUB_WORKSPACE}/${lib}/build
             cmake -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/SuiteSparse_config/cmake_modules/SuiteSparse_cross_compile.cmake \
+                  -DCMAKE_FIND_DEBUG_MODE=ON \
                   -DCMAKE_BUILD_TYPE="Release" \
                   -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}" \
                   -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
