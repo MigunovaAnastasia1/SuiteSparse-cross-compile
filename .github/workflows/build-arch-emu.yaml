@@ -26,7 +26,7 @@ jobs:
     defaults:
       run:
         # Use emulated shell as default
-        shell: bash
+        shell: alpine-target.sh {0}
 
     strategy:
       # Doesn't allow other runners in the matrix to continue if some fail, draft change for experimentation
@@ -63,7 +63,7 @@ jobs:
 
     steps:
       - name: get CPU information (host)
-        # shell: bash
+        shell: bash
         run: lscpu
 
       - name: checkout repository
