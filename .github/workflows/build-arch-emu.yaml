@@ -35,8 +35,8 @@ jobs:
       matrix:
         # For available CPU architectures, see:
         # https://github.com/marketplace/actions/setup-alpine-linux-environment
-        arch: [aarch64, ppc64le, s390x, riscv64]
-        # arch: [x86, aarch64]
+        # arch: [aarch64, ppc64le, s390x, riscv64]
+        arch: [aarch64]
         include:
          # - arch: x86
           #  ccache-max: 64M
@@ -46,12 +46,12 @@ jobs:
             ccache-max: 28M
           # - arch: armv7
           #  ccache-max: 25M
-          - arch: ppc64le
-            ccache-max: 28M
-          - arch: s390x
-            ccache-max: 28M
-          - arch: riscv64
-            ccache-max: 28M
+          # - arch: ppc64le
+          #  ccache-max: 28M
+          # - arch: s390x
+          #  ccache-max: 28M
+          # - arch: riscv64
+          #  ccache-max: 28M
 
     name: alpine (${{ matrix.arch }})
 
@@ -59,6 +59,10 @@ jobs:
       - name: get CPU information (host)
         shell: bash
         run: lscpu
+   
+      - name: command check
+        shell: bash
+        run: which update-binfmts
 
       - name: checkout repository
         uses: actions/checkout@v4
@@ -95,6 +99,7 @@ jobs:
           else 
           echo "target architecture ${{ matrix.arch }} does not require installation"
           fi
+
       - name: install dependencies
         uses: jirutka/setup-alpine@v1
         # shell: bash
