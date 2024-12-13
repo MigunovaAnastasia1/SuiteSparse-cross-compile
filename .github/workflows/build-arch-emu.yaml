@@ -89,25 +89,11 @@ jobs:
             automake
             libtool
           # ${{ matrix.arch != 'riscv64' && 'valgrind' || '' }}
-          shell-name: alpine-target.sh
+          shell-name: alpine-target.sh {0}
 
       - name: get CPU information (emulated)
         shell: alpine-target.sh {0}
         run: lscpu
-
-      - name: create build system
-        uses: jirutka/setup-alpine@v1
-        with:
-          packages: >
-            aptitude
-            build-base
-            ccache
-            cmake
-            autoconf
-            automake
-            libtool
-            pkgconf
-          volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
        
       - name: install cross-toolchain
         shell: bash
