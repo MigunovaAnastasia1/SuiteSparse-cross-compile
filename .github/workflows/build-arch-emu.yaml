@@ -129,6 +129,7 @@ jobs:
         env:
           CCACHE_MAX: ${{ matrix.ccache-max }}
         run: |
+          sudo apt -y install ccache
           test -d ~/.ccache || mkdir ~/.ccache
           echo "max_size = $CCACHE_MAX" >> ~/.ccache/ccache.conf
           echo "compression = true" >> ~/.ccache/ccache.conf
