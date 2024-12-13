@@ -94,23 +94,9 @@ jobs:
       - name: get CPU information (emulated)
         shell: alpine-target.sh {0}
         run: lscpu
-
-      - name: create build system
-        uses: jirutka/setup-alpine@v1
-        with:
-          packages: >
-            aptitude
-            build-base
-            ccache
-            cmake
-            autoconf
-            automake
-            libtool
-            pkgconf
-          volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
        
       - name: install cross-toolchain
-        shell: bash
+        # shell: bash
         run: |
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
@@ -120,6 +106,7 @@ jobs:
           else 
           echo "Target architecture is x86, cross-compilation isn't required, cross-toolchain installation isn't required."
           fi
+
       - name: prepare ccache
         # create key with human readable timestamp
         # used in action/cache/restore and action/cache/save steps
@@ -137,6 +124,7 @@ jobs:
           restore-keys: |
             ccache:alpine:${{ matrix.arch }}:${{ github.ref }}
             ccache:alpine:${{ matrix.arch }}
+
       - name: configure ccache
         env:
           CCACHE_MAX: ${{ matrix.ccache-max }}
@@ -147,6 +135,7 @@ jobs:
           ccache -s
           which ccache
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
+
       - name: build
         env:
           TARGET_ARCH: ${{ matrix.arch }}
@@ -188,6 +177,7 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
+
       - name: check
         timeout-minutes: 60
         run: |
@@ -199,6 +189,7 @@ jobs:
             make demos CMAKE_OPTIONS="-DSUITESPARSE_DEMOS=ON -DBUILD_TESTING=ON"
             echo "::endgroup::"
           done
+
       - name: ccache status
         continue-on-error: true
         run: ccache -s
@@ -221,6 +212,7 @@ jobs:
             cmake --install .
             echo "::endgroup::"
           done
+
       - name: build example using CMake
         run: |
           cd ${GITHUB_WORKSPACE}/Example/build
@@ -239,6 +231,7 @@ jobs:
           printf "\033[1;35m  C++ binary with shared libraries\033[0m\n"
           ./my_cxx_demo
           echo "::endgroup::"
+
       - name: test Config
         run: |
           IFS=:
@@ -253,6 +246,7 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
+
       - name: build example using autotools
         run: |
           cd ${GITHUB_WORKSPACE}/Example
