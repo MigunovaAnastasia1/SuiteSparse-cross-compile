@@ -21,86 +21,57 @@ env:
 jobs:
 
   alpine:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     defaults:
       run:
         # Use emulated shell as default
-        shell: alpine.sh {0}
+        shell: bash
 
     strategy:
       # Doesn't allow other runners in the matrix to continue if some fail, draft change for experimentation
-      fail-fast: true
+      fail-fast: false
 
       matrix:
         # For available CPU architectures, see:
         # https://github.com/marketplace/actions/setup-alpine-linux-environment
-        # arch: [aarch64, ppc64le, s390x, riscv64]
-        arch: [aarch64]
+        arch: [aarch64, armv7, ppc64le, s390x, riscv64]
         include:
-         # - arch: x86
+          # - arch: x86
           #  ccache-max: 64M
           #  extra-build-libs: ":GraphBLAS:LAGraph"
           #  extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: aarch64
+            cross-toolchain: gcc-10-aarch64-linux-gnu
             ccache-max: 28M
-          # - arch: armv7
-          #  ccache-max: 25M
-          # - arch: ppc64le
-          #  ccache-max: 28M
-          # - arch: s390x
-          #  ccache-max: 28M
-          # - arch: riscv64
-          #  ccache-max: 28M
-
+          - arch: armv7
+            cross-toolchain: gcc-arm-linux-gnueabi
+            ccache-max: 25M
+          - arch: ppc64le
+            cross-toolchain: gcc-10-powerpc64le-linux-gnu
+            ccache-max: 28M
+          - arch: s390x
+            cross-toolchain: gcc-10-multilib-s390x-linux-gnu
+            ccache-max: 28M
+          - arch: riscv64
+            cross-toolchain: gcc-10-riscv64-linux-gnu
+            ccache-max: 28M
+    
+    env:
+      CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
     name: alpine (${{ matrix.arch }})
 
     steps:
       - name: get CPU information (host)
-        shell: bash
+        # shell: bash
         run: lscpu
-   
-      - name: command check
-        shell: bash
-        run: which update-binfmts
 
       - name: checkout repository
         uses: actions/checkout@v4
         # shell: bash
 
-        # new step
-      - name: install cross-toolchain
-        shell: bash
-        run: |
-          if [[ ${{ matrix.arch }} != 'x86' ]]
-          then
-          echo "::group::Install Aptitude"
-          sudo apt install aptitude 
-          echo "::endgroup::"
-          echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
-          if [[ ${{ matrix.arch }} = 'aarch64' || ${{ matrix.arch }} = 'riscv64' ]]
-          then
-          sudo aptitude -y  install gcc-10-${{ matrix.arch }}-linux-gnu g++-9-${{ matrix.arch }}-linux-gnu
-          else 
-          if [[ ${{ matrix.arch }} = 'armv7' ]]
-          then
-          # case for armv7, можно с помощью ct-ng собрать
-          echo "nothing"
-          else
-          if [[ ${{ matrix.arch }} = 'ppc64le' ]] 
-          then
-          sudo aptitude -y install  gcc-10-powerpc64le-linux-gnu g++-9-powerpc64le-linux-gnu 
-          else 
-          sudo aptitude -y  install gcc-10-multilib-s390x-linux-gnu g++-9-s390x-linux-gnu
-          fi
-          fi 
-          fi
-          echo "::endgroup::"
-          else 
-          echo "target architecture ${{ matrix.arch }} does not require installation"
-          fi
-
-      - name: install dependencies
+      - name: install dependencies (target)
+        id: alpine-target
         uses: jirutka/setup-alpine@v1
         # shell: bash
         with:
@@ -113,16 +84,42 @@ jobs:
             gmp-dev
             mpfr-dev
             lapack-dev
-            openblas-dev
             util-linux-misc
             autoconf
             automake
             libtool
           # ${{ matrix.arch != 'riscv64' && 'valgrind' || '' }}
+          shell-name: alpine-target.sh
 
       - name: get CPU information (emulated)
+        shell: alpine-target.sh {0}
         run: lscpu
 
+      - name: create build system
+        uses: jirutka/setup-alpine@v1
+        with:
+          packages: >
+            aptitude
+            build-base
+            ccache
+            cmake
+            autoconf
+            automake
+            libtool
+            pkgconf
+          volumes: ${{ steps.alpine-target.outputs.root-path }}:${{ env.CROSS_SYSROOT }}
+       
+      - name: install cross-toolchain
+        shell: bash
+        run: |
+          if [[ ${{ matrix.arch }} != 'x86' ]]
+          then
+          echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
+          sudo apt -y install ${{ matrix.cross-toolchain }}          
+          echo "::endgroup::"
+          else 
+          echo "Target architecture is x86, cross-compilation isn't required, cross-toolchain installation isn't required."
+          fi
       - name: prepare ccache
         # create key with human readable timestamp
         # used in action/cache/restore and action/cache/save steps
@@ -151,14 +148,17 @@ jobs:
           which ccache
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
       - name: build
-        shell: bash
         env:
           TARGET_ARCH: ${{ matrix.arch }}
-          CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}
+          CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
+        # shell: bash
         run: |
-          ls ${CROSS_SYSROOT}/usr/local/lib
-          ls ${CROSS_SYSROOT}/usr/lib
-          ls ${CROSS_SYSROOT}/lib
+          echo "::group::Contents of ${CROSS_SYSROOT}/usr/lib"
+          ls ${CROSS_SYSROOT}/usr/lib 
+          echo "::endgroup::"
+          echo "::group::Contents of ${CROSS_SYSROOT}/lib"
+          ls ${CROSS_SYSROOT}/lib 
+          echo "::endgroup::"
           echo "gcc --version"
           gcc --version
           echo "gcc -dumpmachine"
@@ -170,6 +170,7 @@ jobs:
             echo "::group::Configure $lib"
             cd ${GITHUB_WORKSPACE}/${lib}/build
             cmake -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/SuiteSparse_config/cmake_modules/SuiteSparse_cross_compile.cmake \
+                  -DCMAKE_FIND_DEBUG_MODE=ON \
                   -DCMAKE_BUILD_TYPE="Release" \
                   -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}" \
                   -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
