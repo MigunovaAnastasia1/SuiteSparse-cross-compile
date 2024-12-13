@@ -89,7 +89,7 @@ jobs:
             automake
             libtool
           # ${{ matrix.arch != 'riscv64' && 'valgrind' || '' }}
-          shell-name: alpine-target.sh {0}
+          shell-name: alpine-target.sh
 
       - name: get CPU information (emulated)
         shell: alpine-target.sh {0}
