@@ -151,7 +151,7 @@ jobs:
           # gcc -dumpmachine
           export PATH=$PATH:/home/runner/rootfs/alpine-latest-${{ matrix.arch }}
           echo "::group::Install - libtool automake autoconf - for host"
-          sudo apt -y install gfortran libtool automake autoconf # ранее это всё устанвливалось на Alpine; последние два вроде не используются на этом шаге, они понадобятся на последующих, но пусть пока тут побудут 
+          sudo apt -y install libtool automake autoconf # ранее это всё устанвливалось на Alpine; последние два вроде не используются на этом шаге, они понадобятся на последующих, но пусть пока тут побудут 
           echo "::endgroup::"
           IFS=:
           BUILD_LIBS="${BUILD_LIBS}${{ matrix.extra-build-libs }}"
