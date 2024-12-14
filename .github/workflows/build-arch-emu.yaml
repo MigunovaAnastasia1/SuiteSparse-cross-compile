@@ -59,7 +59,7 @@ jobs:
           #  ccache-max: 28M
     
     env:
-      CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
+      CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
     name: alpine (${{ matrix.arch }})
 
     steps:
