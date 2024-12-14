@@ -85,7 +85,7 @@ jobs:
             gmp-dev
             mpfr-dev
             lapack-dev
-            util-linux-misc - на Alpine нужно только для lscpu, поэтому пришлось вернуть; но пока непонятно, прийдётся ли устанавливать что-то аналогичное на Ubuntu
+            util-linux-misc # на Alpine нужно только для lscpu, поэтому пришлось вернуть; но пока непонятно, прийдётся ли устанавливать что-то аналогичное на Ubuntu
           # ${{ matrix.arch != 'riscv64' && 'valgrind' || '' }}
           shell-name: alpine-target.sh
 
