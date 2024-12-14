@@ -70,7 +70,8 @@ endif ( )
 # change the scope of the dependency search
 #-------------------------------------------------------------------------------
 
-include ( SuiteSparse_cross_compile )
+set( CMAKE_INCLUDE_PATH "/home/runner/rootfs/alpine-latest-aarch64" )
+set( CMAKE_LIBRARY_PATH "/home/runner/rootfs/alpine-latest-aarch64" )
 
 #-------------------------------------------------------------------------------
 # find OpenMP
