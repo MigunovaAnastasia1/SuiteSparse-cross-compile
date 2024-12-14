@@ -70,8 +70,9 @@ endif ( )
 # change the scope of the dependency search
 #-------------------------------------------------------------------------------
 
-set( CMAKE_INCLUDE_PATH "/home/runner/rootfs/alpine-latest-aarch64" )
-set( CMAKE_LIBRARY_PATH "/home/runner/rootfs/alpine-latest-aarch64" )
+# set( CMAKE_INCLUDE_PATH "/home/runner/rootfs/alpine-latest-aarch64" )
+# set( CMAKE_LIBRARY_PATH "/home/runner/rootfs/alpine-latest-aarch64" )
+set( FC "aarch64-linux-gnu-gfortran-10" ) 
 
 #-------------------------------------------------------------------------------
 # find OpenMP
