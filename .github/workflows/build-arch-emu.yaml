@@ -44,6 +44,8 @@ jobs:
           #  extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: aarch64
             cross-toolchain: g++-9-aarch64-linux-gnu
+            cc: "aarch64-linux-gnu-gcc-9"
+            cxx: "aarch64-linux-gnu-g++-9"
             ccache-max: 28M
           # - arch: armv7
           #  cross-toolchain: g++-arm-linux-gnueabi
@@ -59,6 +61,9 @@ jobs:
           #  ccache-max: 28M
     
     name: alpine (${{ matrix.arch }})
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
 
     steps:
       - name: get CPU information (host)
@@ -76,17 +81,11 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           packages: >
-            build-base
-            ccache
-            cmake
-            gfortran
+            build-base # под вопросом
             gmp-dev
             mpfr-dev
             lapack-dev
-            util-linux-misc
-            autoconf
-            automake
-            libtool
+            # util-linux-misc - на Alpine точно не нужно, но пока непонятно, прийдётся ли устанавливать что-то аналогичное на Ubuntu
           # ${{ matrix.arch != 'riscv64' && 'valgrind' || '' }}
           shell-name: alpine-target.sh
 
@@ -134,22 +133,26 @@ jobs:
           which ccache
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
       - name: build
-        env:
-          TARGET_ARCH: ${{ matrix.arch }}
-          CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
+        # env:
+          # TARGET_ARCH: ${{ matrix.arch }}
+          # CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
         run: |
           # echo "gcc --version"
           # gcc --version
           # echo "gcc -dumpmachine"
           # gcc -dumpmachine
+          export PATH=$PATH:/home/runner/rootfs/alpine-latest-${{ matrix.arch }}
+          echo "::group::Install - gfortran libtool automake autoconf - for host"
+          sudo apt -y install gfortran libtool automake autoconf # ранее это всё устанвливалось на Alpine; последние два вроде не используются на этом шаге, они понадобятся на последующих, но пусть пока тут побудут 
+          echo "::endgroup::"
           IFS=:
           BUILD_LIBS="${BUILD_LIBS}${{ matrix.extra-build-libs }}"
           for lib in ${BUILD_LIBS}; do
             printf "   \033[0;32m==>\033[0m Building library \033[0;32m${lib}\033[0m\n"
             echo "::group::Configure $lib"
             cd ${GITHUB_WORKSPACE}/${lib}/build
-            cmake -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/SuiteSparse_config/cmake_modules/SuiteSparse_cross_compile.cmake \
-                  -DCMAKE_BUILD_TYPE="Release" \
+            cmake -DCMAKE_BUILD_TYPE="Release" \
+                  # -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/SuiteSparse_config/cmake_modules/SuiteSparse_cross_compile.cmake \
                   -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}" \
                   -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
                   -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
@@ -199,6 +202,7 @@ jobs:
             cmake --install .
             echo "::endgroup::"
           done
+
       - name: build example using CMake
         run: |
           cd ${GITHUB_WORKSPACE}/Example/build
@@ -217,6 +221,7 @@ jobs:
           printf "\033[1;35m  C++ binary with shared libraries\033[0m\n"
           ./my_cxx_demo
           echo "::endgroup::"
+
       - name: test Config
         run: |
           IFS=:
@@ -231,6 +236,7 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
+
       - name: build example using autotools
         run: |
           cd ${GITHUB_WORKSPACE}/Example
