@@ -57,10 +57,6 @@ jobs:
           # - arch: riscv64
           #  cross-toolchain: g++-9-riscv64-linux-gnu
           #  ccache-max: 28M
-    
-    env:
-      CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }} # path to the directory in the host, where target enviroment will be placed 
-      TARGET_ARCH: ${{ matrix.arch }}
 
     name: alpine (${{ matrix.arch }})
 
@@ -141,9 +137,9 @@ jobs:
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
 
       - name: build
-        # env:
-          # TARGET_ARCH: ${{ matrix.arch }}
-          # CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
+        env:
+          CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }} # path to the directory in the host, where target enviroment will be placed 
+          TARGET_ARCH: ${{ matrix.arch }}
         # shell: bash
         run: |
           # echo "gcc --version"
