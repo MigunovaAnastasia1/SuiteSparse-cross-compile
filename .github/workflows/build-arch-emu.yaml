@@ -145,7 +145,7 @@ jobs:
           # gcc --version
           # echo "gcc -dumpmachine"
           # gcc -dumpmachine
-          export PATH=$PATH:/home/runner/rootfs/alpine-latest-${{ matrix.arch }}
+          export PATH=/home/runner/rootfs/alpine-latest-${{ matrix.arch }}:$PATH
           echo "::group::Install - libtool automake autoconf - for host"
           sudo apt -y install libtool automake autoconf  
           echo "::endgroup::"
