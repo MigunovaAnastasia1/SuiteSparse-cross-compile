@@ -70,7 +70,7 @@ endif ( )
 # change the scope of the dependency search
 #-------------------------------------------------------------------------------
 
-set( CMAKE_MODULE_PATH "/home/runner/rootfs/alpine-latest-aarch64" )
+set( CMAKE_PREFIX_PATH "/home/runner/rootfs/alpine-latest-aarch64" )
 
 #-------------------------------------------------------------------------------
 # find OpenMP
