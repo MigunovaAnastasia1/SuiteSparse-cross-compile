@@ -44,8 +44,10 @@ jobs:
           #  extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: aarch64
             cross-toolchain: g++-9-aarch64-linux-gnu
+            fortran-cross-toolchain: gfortran-10-aarch64-linux-gnu
             cc: "aarch64-linux-gnu-gcc-9"
             cxx: "aarch64-linux-gnu-g++-9"
+            fc: "aarch64-linux-gnu-gfortran-10"
             ccache-max: 28M
           # - arch: armv7
           #  cross-toolchain: g++-arm-linux-gnueabi
@@ -64,6 +66,7 @@ jobs:
     env:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
+      FC: ${{ matrix.fc }}
 
     steps:
       - name: get CPU information (host)
@@ -100,7 +103,7 @@ jobs:
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
-          sudo apt -y install ${{ matrix.cross-toolchain }}          
+          sudo apt -y install ${{ matrix.cross-toolchain }} ${{ matrix.fortran-cross-toolchain }}       
           echo "::endgroup::"
           else 
           echo "Target architecture is x86, cross-compilation isn't required, cross-toolchain installation isn't required."
@@ -143,8 +146,8 @@ jobs:
           # echo "gcc -dumpmachine"
           # gcc -dumpmachine
           export PATH=$PATH:/home/runner/rootfs/alpine-latest-${{ matrix.arch }}
-          echo "::group::Install - gfortran libtool automake autoconf - for host"
-          sudo apt -y install gfortran libtool automake autoconf # ранее это всё устанвливалось на Alpine; последние два вроде не используются на этом шаге, они понадобятся на последующих, но пусть пока тут побудут 
+          echo "::group::Install - libtool automake autoconf - for host"
+          sudo apt -y install libtool automake autoconf  
           echo "::endgroup::"
           IFS=:
           BUILD_LIBS="${BUILD_LIBS}${{ matrix.extra-build-libs }}"
