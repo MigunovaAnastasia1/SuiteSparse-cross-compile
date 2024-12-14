@@ -136,9 +136,11 @@ jobs:
           which ccache
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
       - name: build
-        # env:
-          # TARGET_ARCH: ${{ matrix.arch }}
-          # CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
+        env:
+          CMAKE_FIND_ROOT_PATH: "/home/runner/rootfs/alpine-latest-${{ matrix.arch }}" 
+          CMAKE_FIND_ROOT_PATH_MODE_PROGRAM: NEVER
+          CMAKE_FIND_ROOT_PATH_MODE_LIBRARY: ONLY
+          CMAKE_FIND_ROOT_PATH_MODE_INCLUDE: ONLY
         run: |
           # echo "gcc --version"
           # gcc --version
@@ -147,7 +149,7 @@ jobs:
           echo "::group::Install - libtool automake autoconf - for host"
           sudo apt -y install libtool automake autoconf  
           echo "::endgroup::"
-          export PATH=/home/runner/rootfs/alpine-latest-${{ matrix.arch }}
+          # export PATH=/home/runner/rootfs/alpine-latest-${{ matrix.arch }}
           IFS=:
           BUILD_LIBS="${BUILD_LIBS}${{ matrix.extra-build-libs }}"
           for lib in ${BUILD_LIBS}; do
