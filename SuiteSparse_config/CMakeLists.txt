@@ -66,12 +66,6 @@ if ( SUITESPARSE_HAS_CUDA AND MSVC )
     message ( WARNING "NOTE: CUDA on MSVC has only recently been revised.  It appears to be functional but has not been as rigorously tested as I would like (I have limited resources for testing CUDA on Windows).  If you encounter issues, set the cmake option SUITESPARSE_USE_CUDA to OFF and post an issue on GitHub." )
 endif ( )
 
-#-я-----------------------------------------------------------------------------
-# change the scope of the dependency search
-#-------------------------------------------------------------------------------
-
-set( CMAKE_PREFIX_PATH "/home/runner/rootfs/alpine-latest-aarch64" )
-
 #-------------------------------------------------------------------------------
 # find OpenMP
 #-------------------------------------------------------------------------------
