@@ -58,8 +58,6 @@ jobs:
           #  cross-toolchain: g++-9-riscv64-linux-gnu
           #  ccache-max: 28M
     
-    env:
-      CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
     name: alpine (${{ matrix.arch }})
 
     steps:
@@ -138,8 +136,7 @@ jobs:
       - name: build
         env:
           TARGET_ARCH: ${{ matrix.arch }}
-          CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
-        # shell: bash
+          CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
         run: |
           # echo "gcc --version"
           # gcc --version
@@ -150,7 +147,6 @@ jobs:
           for lib in ${BUILD_LIBS}; do
             printf "   \033[0;32m==>\033[0m Building library \033[0;32m${lib}\033[0m\n"
             echo "::group::Configure $lib"
-            echo "debug info: ${GITHUB_WORKSPACE}"
             cd ${GITHUB_WORKSPACE}/${lib}/build
             cmake -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/SuiteSparse_config/cmake_modules/SuiteSparse_cross_compile.cmake \
                   -DCMAKE_BUILD_TYPE="Release" \
