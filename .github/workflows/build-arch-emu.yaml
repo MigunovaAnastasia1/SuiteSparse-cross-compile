@@ -25,7 +25,6 @@ jobs:
 
     defaults:
       run:
-        # Use emulated shell as default
         shell: bash
 
     strategy:
@@ -145,10 +144,10 @@ jobs:
           # gcc --version
           # echo "gcc -dumpmachine"
           # gcc -dumpmachine
-          export PATH=/home/runner/rootfs/alpine-latest-${{ matrix.arch }}:$PATH
           echo "::group::Install - libtool automake autoconf - for host"
           sudo apt -y install libtool automake autoconf  
           echo "::endgroup::"
+          export PATH=/home/runner/rootfs/alpine-latest-${{ matrix.arch }}
           IFS=:
           BUILD_LIBS="${BUILD_LIBS}${{ matrix.extra-build-libs }}"
           for lib in ${BUILD_LIBS}; do
