@@ -43,21 +43,23 @@ jobs:
           #  extra-build-libs: ":GraphBLAS:LAGraph"
           #  extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: aarch64
-            cross-toolchain: g++-9-aarch64-linux-gnu
+            cross-toolchain: gcc-10-aarch64-linux-gnu
             ccache-max: 28M
           # - arch: armv7
-          #  cross-toolchain: g++-arm-linux-gnueabi
+          #  cross-toolchain: gcc-arm-linux-gnueabi
           #  ccache-max: 25M
           # - arch: ppc64le
-          #  cross-toolchain: g++-9-powerpc64le-linux-gnu
+          #  cross-toolchain: gcc-10-powerpc64le-linux-gnu
           #  ccache-max: 28M
           # - arch: s390x
-          #  cross-toolchain: g++-9-multilib-s390x-linux-gnu
+          #  cross-toolchain: gcc-10-multilib-s390x-linux-gnu
           #  ccache-max: 28M
           # - arch: riscv64
-          #  cross-toolchain: g++-9-riscv64-linux-gnu
+          #  cross-toolchain: gcc-10-riscv64-linux-gnu
           #  ccache-max: 28M
-
+    
+    env:
+      CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
     name: alpine (${{ matrix.arch }})
 
     steps:
@@ -105,7 +107,6 @@ jobs:
           else 
           echo "Target architecture is x86, cross-compilation isn't required, cross-toolchain installation isn't required."
           fi
-
       - name: prepare ccache
         # create key with human readable timestamp
         # used in action/cache/restore and action/cache/save steps
@@ -123,7 +124,6 @@ jobs:
           restore-keys: |
             ccache:alpine:${{ matrix.arch }}:${{ github.ref }}
             ccache:alpine:${{ matrix.arch }}
-
       - name: configure ccache
         env:
           CCACHE_MAX: ${{ matrix.ccache-max }}
@@ -135,11 +135,10 @@ jobs:
           ccache -s
           which ccache
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
-
       - name: build
         env:
-          CROSS_SYSROOT: /home/runner/rootfs/alpine-latest-${{ matrix.arch }} # path to the directory in the host, where target enviroment will be placed 
           TARGET_ARCH: ${{ matrix.arch }}
+          CROSS_SYSROOT: /mnt/alpine-${{ matrix.arch }} # alpine x86_64's directory, where will be placed target enviroment
         # shell: bash
         run: |
           # echo "gcc --version"
@@ -151,10 +150,9 @@ jobs:
           for lib in ${BUILD_LIBS}; do
             printf "   \033[0;32m==>\033[0m Building library \033[0;32m${lib}\033[0m\n"
             echo "::group::Configure $lib"
+            echo "debug info: ${GITHUB_WORKSPACE}"
             cd ${GITHUB_WORKSPACE}/${lib}/build
-            echo "debug info: ${GITHUB_WORKSPACE} + / + ${lib} + / + build"
             cmake -DCMAKE_TOOLCHAIN_FILE=${GITHUB_WORKSPACE}/SuiteSparse_config/cmake_modules/SuiteSparse_cross_compile.cmake \
-                  # -DCMAKE_FIND_DEBUG_MODE=ON \
                   -DCMAKE_BUILD_TYPE="Release" \
                   -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}" \
                   -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
@@ -172,7 +170,6 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
-
       - name: check
         timeout-minutes: 60
         run: |
@@ -184,7 +181,6 @@ jobs:
             make demos CMAKE_OPTIONS="-DSUITESPARSE_DEMOS=ON -DBUILD_TESTING=ON"
             echo "::endgroup::"
           done
-
       - name: ccache status
         continue-on-error: true
         run: ccache -s
@@ -207,7 +203,6 @@ jobs:
             cmake --install .
             echo "::endgroup::"
           done
-
       - name: build example using CMake
         run: |
           cd ${GITHUB_WORKSPACE}/Example/build
@@ -226,7 +221,6 @@ jobs:
           printf "\033[1;35m  C++ binary with shared libraries\033[0m\n"
           ./my_cxx_demo
           echo "::endgroup::"
-
       - name: test Config
         run: |
           IFS=:
@@ -241,7 +235,6 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
-
       - name: build example using autotools
         run: |
           cd ${GITHUB_WORKSPACE}/Example
