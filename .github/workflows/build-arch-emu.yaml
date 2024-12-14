@@ -44,10 +44,8 @@ jobs:
           #  extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: aarch64
             cross-toolchain: g++-9-aarch64-linux-gnu
-            fortran_cross-toolchain: gfortran-10-aarch64-linux-gnu
             cc: "aarch64-linux-gnu-gcc-9"
             cxx: "aarch64-linux-gnu-g++-9"
-            fc: "aarch64-linux-gnu-gfortran-10"
             ccache-max: 28M
           # - arch: armv7
           #  cross-toolchain: g++-arm-linux-gnueabi
@@ -66,10 +64,8 @@ jobs:
     env:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
-      FC: ${{ matrix.fc }}
 
     steps:
-
       - name: get CPU information (host)
         # shell: bash
         run: lscpu
@@ -98,18 +94,17 @@ jobs:
         shell: alpine-target.sh {0}
         run: lscpu
        
-      - name: install C/C++ and Fortran cross-toolchaines
+      - name: install cross-toolchain
         # shell: bash
         run: |
           if [[ ${{ matrix.arch }} != 'x86' ]]
           then
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
-          sudo apt -y install ${{ matrix.cross-toolchain }} ${{ matrix.fortran_cross-toolchain }}     
+          sudo apt -y install ${{ matrix.cross-toolchain }}          
           echo "::endgroup::"
           else 
           echo "Target architecture is x86, cross-compilation isn't required, cross-toolchain installation isn't required."
           fi
-
       - name: prepare ccache
         # create key with human readable timestamp
         # used in action/cache/restore and action/cache/save steps
@@ -127,7 +122,6 @@ jobs:
           restore-keys: |
             ccache:alpine:${{ matrix.arch }}:${{ github.ref }}
             ccache:alpine:${{ matrix.arch }}
-
       - name: configure ccache
         env:
           CCACHE_MAX: ${{ matrix.ccache-max }}
@@ -139,7 +133,6 @@ jobs:
           ccache -s
           which ccache
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
-
       - name: build
         # env:
           # TARGET_ARCH: ${{ matrix.arch }}
@@ -150,8 +143,8 @@ jobs:
           # echo "gcc -dumpmachine"
           # gcc -dumpmachine
           export PATH=$PATH:/home/runner/rootfs/alpine-latest-${{ matrix.arch }}
-          echo "::group::Install - libtool automake autoconf - for host"
-          sudo apt -y install libtool automake autoconf # ранее это всё устанвливалось на Alpine; последние два вроде не используются на этом шаге, они понадобятся на последующих, но пусть пока тут побудут 
+          echo "::group::Install - gfortran libtool automake autoconf - for host"
+          sudo apt -y install gfortran libtool automake autoconf # ранее это всё устанвливалось на Alpine; последние два вроде не используются на этом шаге, они понадобятся на последующих, но пусть пока тут побудут 
           echo "::endgroup::"
           IFS=:
           BUILD_LIBS="${BUILD_LIBS}${{ matrix.extra-build-libs }}"
@@ -176,7 +169,6 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
-
       - name: check
         timeout-minutes: 60
         run: |
@@ -210,7 +202,6 @@ jobs:
             cmake --install .
             echo "::endgroup::"
           done
-
       - name: build example using CMake
         run: |
           cd ${GITHUB_WORKSPACE}/Example/build
@@ -229,7 +220,6 @@ jobs:
           printf "\033[1;35m  C++ binary with shared libraries\033[0m\n"
           ./my_cxx_demo
           echo "::endgroup::"
-
       - name: test Config
         run: |
           IFS=:
@@ -244,7 +234,6 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
-
       - name: build example using autotools
         run: |
           cd ${GITHUB_WORKSPACE}/Example
