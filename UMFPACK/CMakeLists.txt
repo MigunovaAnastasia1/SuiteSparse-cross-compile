@@ -40,6 +40,12 @@ set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 
 include ( SuiteSparsePolicy )
 
+#------------------------------------------------------------------------------
+# change the scope of the dependency search for cross-compilation
+#-------------------------------------------------------------------------------
+
+include( SuiteSparse_cross_compile )
+
 #-------------------------------------------------------------------------------
 # find library dependencies
 #-------------------------------------------------------------------------------
