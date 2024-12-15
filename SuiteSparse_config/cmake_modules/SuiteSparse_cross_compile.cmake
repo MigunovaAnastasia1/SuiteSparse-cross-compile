@@ -1,31 +1,16 @@
-# the name of the target operating system
-# set(CMAKE_SYSTEM_NAME Linux)
+#-------------------------------------------------------------------------------
+# SuiteSparse/SuiteSparse_config/cmake_modules/SuiteSparseBLAS.cmake
+#-------------------------------------------------------------------------------
 
-# which compilers to use for C and C++
-# if ( $ENV{TARGET_ARCH} MATCHES "aarch64" OR $ENV{TARGET_ARCH} MATCHES "riscv64" )
-#    set(CMAKE_C_COMPILER   "/usr/bin/$ENV{TARGET_ARCH}-linux-gnu-gcc-9")
-#    set(CMAKE_CXX_COMPILER   "/usr/bin/$ENV{TARGET_ARCH}-linux-gnu-g++-9")
-# elseif ( $ENV{TARGET_ARCH} MATCHES "ppc64le" )
-#    set(CMAKE_C_COMPILER   "/usr/bin/powerpc64le-linux-gnu-gcc-9")
-#    set(CMAKE_CXX_COMPILER   "/usr/bin/powerpc64le-linux-gnu-g++-9")
-# elseif ( $ENV{TARGET_ARCH} MATCHES "armv7" )
-#    set(CMAKE_C_COMPILER   "/usr/bin/arm-linux-gnueabi-gcc")
-#    set(CMAKE_CXX_COMPILER   "/usr/bin/arm-linux-gnueabi-g++")
-# elseif ( $ENV{TARGET_ARCH} MATCHES "x86" )
-#    set(CMAKE_C_COMPILER   "/usr/bin/gcc")
-#    set(CMAKE_CXX_COMPILER   "/usr/bin/g++")
-# else ( )
-#    set(CMAKE_C_COMPILER   "/usr/bin/s390x-linux-gnu-gcc-9")
-#    set(CMAKE_CXX_COMPILER   "/usr/bin/s390x-linux-gnu-g++-9")
-# endif ( )
+# SuiteSparse_config, Copyright (c) 2012-2023, Timothy A. Davis.
+# All Rights Reserved.
+# SPDX-License-Identifier: BSD-3-clause
 
-# where is the target environment located
-set(CMAKE_FIND_ROOT_PATH $ENV{CROSS_SYSROOT})
+#-------------------------------------------------------------------------------
 
-# adjust the default behavior of the FIND_XXX() commands:
-# search programs in the host environment
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+# This module implements cross-compilation for SuiteSparse:
+# set the CMAKE_PREFIX_PATH cache variable to tell cmake to search 
+# dependencies for SuiteSparse build in the directory where  
+# the target environment is located
 
-# search headers and libraries in the target environment
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set ( CMAKE_PREFIX_PATH $ENV{CROSS_SYSROOT} )

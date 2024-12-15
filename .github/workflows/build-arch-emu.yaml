@@ -137,10 +137,7 @@ jobs:
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
       - name: build
         env:
-          CMAKE_FIND_ROOT_PATH: "/home/runner/rootfs/alpine-latest-${{ matrix.arch }}" 
-          CMAKE_FIND_ROOT_PATH_MODE_PROGRAM: NEVER
-          CMAKE_FIND_ROOT_PATH_MODE_LIBRARY: ONLY
-          CMAKE_FIND_ROOT_PATH_MODE_INCLUDE: ONLY
+          CROSS_SYSROOT: "/home/runner/rootfs/alpine-latest-${{ matrix.arch }}/usr"
         run: |
           # echo "gcc --version"
           # gcc --version
