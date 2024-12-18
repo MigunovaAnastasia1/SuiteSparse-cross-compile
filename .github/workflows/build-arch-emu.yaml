@@ -68,6 +68,7 @@ jobs:
       FC: ${{ matrix.fc }}
 
     steps:
+
       - name: get CPU information (host)
         # shell: bash
         run: lscpu
@@ -107,12 +108,14 @@ jobs:
           else 
           echo "Target architecture is x86, cross-compilation isn't required, cross-toolchain installation isn't required."
           fi
+
       - name: prepare ccache
         # create key with human readable timestamp
         # used in action/cache/restore and action/cache/save steps
         id: ccache-prepare
         run: |
           echo "key=ccache:alpine:${{ matrix.arch }}:${{ github.ref }}:$(date +"%Y-%m-%d_%H-%M-%S"):${{ github.sha }}" >> $GITHUB_OUTPUT
+
       - name: restore ccache
         # setup the GitHub cache used to maintain the ccache from one job to the next
         uses: actions/cache/restore@v4
@@ -124,6 +127,7 @@ jobs:
           restore-keys: |
             ccache:alpine:${{ matrix.arch }}:${{ github.ref }}
             ccache:alpine:${{ matrix.arch }}
+
       - name: configure ccache
         env:
           CCACHE_MAX: ${{ matrix.ccache-max }}
@@ -135,6 +139,7 @@ jobs:
           ccache -s
           which ccache
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
+
       - name: build
         env:
           CROSS_SYSROOT: "/home/runner/rootfs/alpine-latest-${{ matrix.arch }}/usr"
@@ -170,6 +175,12 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
+
+      - name: install qemu-${{ matrix.arch }} # binfmts внесёт qemu в список возможных интерпретаторов и сопоставит ему формат бинарников, которые будут подаваться ему на выполнение 
+        echo "::group::Install qemu emulator for ${{ matrix.arch }}"
+        sudo apt install -y qemu-${{ matrix.arch }}
+        echo "::endgroup::"
+
       - name: check
         timeout-minutes: 60
         run: |
@@ -181,6 +192,7 @@ jobs:
             make demos CMAKE_OPTIONS="-DSUITESPARSE_DEMOS=ON -DBUILD_TESTING=ON"
             echo "::endgroup::"
           done
+
       - name: ccache status
         continue-on-error: true
         run: ccache -s
@@ -203,6 +215,7 @@ jobs:
             cmake --install .
             echo "::endgroup::"
           done
+
       - name: build example using CMake
         run: |
           cd ${GITHUB_WORKSPACE}/Example/build
@@ -221,6 +234,7 @@ jobs:
           printf "\033[1;35m  C++ binary with shared libraries\033[0m\n"
           ./my_cxx_demo
           echo "::endgroup::"
+
       - name: test Config
         run: |
           IFS=:
@@ -235,6 +249,7 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
+
       - name: build example using autotools
         run: |
           cd ${GITHUB_WORKSPACE}/Example
