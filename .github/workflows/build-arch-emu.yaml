@@ -176,11 +176,11 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: install qemu-${{ matrix.arch }} 
+      - name: install qemu-user 
         # binfmts внесёт qemu в список возможных интерпретаторов и сопоставит ему формат бинарников, которые будут подаваться ему на выполнение 
         run: |
-          echo "::group::Install qemu emulator for ${{ matrix.arch }}"
-          sudo apt install -y qemu-${{ matrix.arch }}
+          echo "::group::Install QEMU user mode emulator to run binaries for target system"
+          sudo apt install -y qemu-user
           echo "::endgroup::"
 
       - name: check
