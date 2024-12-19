@@ -179,7 +179,7 @@ jobs:
       - name: check
         timeout-minutes: 60
         run: |
-          sudo mv ld-linux-${{ matrix.arch }}.so.1 /lib 
+          sudo cp /lib64/ld-linux-x86-64.so.2 /lib/ld-linux-aarch64.so.1 
           IFS=':'
           CHECK_LIBS="${CHECK_LIBS}${{ matrix.extra-check-libs }}"
           for lib in ${CHECK_LIBS}; do
