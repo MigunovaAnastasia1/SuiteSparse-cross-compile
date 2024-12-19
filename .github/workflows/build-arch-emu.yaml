@@ -106,7 +106,7 @@ jobs:
 
       - name: replace qemu
         run: |
-          sudo apt install qemu-user
+          sudo apt install qemu-user=7.0.0
           sudo rm -f /usr/local/bin/qemu-aarch64
        
       - name: install cross-toolchain
