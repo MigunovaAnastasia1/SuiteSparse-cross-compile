@@ -179,7 +179,7 @@ jobs:
       - name: check
         timeout-minutes: 60
         run: |
-          whereis qemu-aarch64
+          sudo mv ld-linux-${{ matrix.arch }}.so.1 /lib 
           IFS=':'
           CHECK_LIBS="${CHECK_LIBS}${{ matrix.extra-check-libs }}"
           for lib in ${CHECK_LIBS}; do
