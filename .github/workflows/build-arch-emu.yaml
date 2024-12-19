@@ -98,9 +98,7 @@ jobs:
         shell: alpine-target.sh {0}
         run: |
           ls /usr/lib
-          ls /lib
-          ls /usr/local/lib
-
+         
       - name: get CPU information (emulated)
         shell: alpine-target.sh {0}
         run: lscpu
