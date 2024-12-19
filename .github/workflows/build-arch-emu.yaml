@@ -183,7 +183,7 @@ jobs:
       - name: check
         timeout-minutes: 60
         run: |
-          export LD_LIBRARY_PATH="/home/runner/rootfs/alpine-latest-${{ matrix.arch }}/usr/lib:/usr/aarch64-linux-gnu/lib"                                                                           
+          export LD_LIBRARY_PATH="/home/runner/rootfs/alpine-latest-${{ matrix.arch }}/usr/lib:/home/runner/rootfs/alpine-latest-${{ matrix.arch }}/usr/local/lib:/usr/aarch64-linux-gnu/lib"                                                                           
           sudo cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1  /lib/ld-linux-aarch64.so.1
           IFS=':'
           CHECK_LIBS="${CHECK_LIBS}${{ matrix.extra-check-libs }}"
