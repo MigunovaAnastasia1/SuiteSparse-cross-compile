@@ -110,8 +110,9 @@ jobs:
           echo "Target architecture is x86, cross-compilation isn't required, cross-toolchain installation isn't required."
           fi
 
-      - name: copy loader to run demo cross-copiled in the future
+      - name: try to set ld_library_path + copy loader to run demo cross-copiled in the future
         run: |
+          export LD_LIBRARY_PATH=${CROSS_SYSROOT}/lib
           sudo cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1  /lib/ld-linux-aarch64.so.1
 
       - name: prepare ccache
@@ -187,7 +188,7 @@ jobs:
           for lib in ${CHECK_LIBS}; do
             printf "::group::   \033[0;32m==>\033[0m Checking library \033[0;32m${lib}\033[0m\n"
             cd ${GITHUB_WORKSPACE}/${lib}
-            make demos CMAKE_OPTIONS="-DSUITESPARSE_DEMOS=ON -DBUILD_TESTING=ON -DLD_LIBRARY_PATH=/home/runner/rootfs/alpine-latest-${{ matrix.arch }}"
+            make demos CMAKE_OPTIONS="-DSUITESPARSE_DEMOS=ON -DBUILD_TESTING=ON"
             echo "::endgroup::"
           done
 
