@@ -182,7 +182,8 @@ jobs:
 
       - name: check
         timeout-minutes: 60
-        run: | 
+        run: |
+          export PATH=$PATH:/home/runner/rootfs/alpine-latest-${{ matrix.arch }} 
           IFS=':'
           CHECK_LIBS="${CHECK_LIBS}${{ matrix.extra-check-libs }}"
           for lib in ${CHECK_LIBS}; do
