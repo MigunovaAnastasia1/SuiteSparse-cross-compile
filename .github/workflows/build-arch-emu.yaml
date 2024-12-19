@@ -72,7 +72,10 @@ jobs:
 
       - name: get CPU information (host)
         # shell: bash
-        run: lscpu
+        run: |
+          lscpu
+          apt show qemu-aarch64
+          apt show qemu
 
       - name: checkout repository
         uses: actions/checkout@v4
