@@ -109,6 +109,10 @@ jobs:
           echo "Target architecture is x86, cross-compilation isn't required, cross-toolchain installation isn't required."
           fi
 
+      - name: copy loader to run demo cross-copiled in the future
+        run: |
+          sudo cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1  /lib/ld-linux-aarch64.so.1
+
       - name: prepare ccache
         # create key with human readable timestamp
         # used in action/cache/restore and action/cache/save steps
@@ -178,8 +182,7 @@ jobs:
 
       - name: check
         timeout-minutes: 60
-        run: |
-          sudo cp /lib64/ld-linux-x86-64.so.2 /lib/ld-linux-aarch64.so.1 
+        run: | 
           IFS=':'
           CHECK_LIBS="${CHECK_LIBS}${{ matrix.extra-check-libs }}"
           for lib in ${CHECK_LIBS}; do
