@@ -66,6 +66,7 @@ jobs:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
       FC: ${{ matrix.fc }}
+      CROSS_SYSROOT: "/home/runner/rootfs/alpine-latest-${{ matrix.arch }}/usr"
 
     steps:
 
@@ -84,19 +85,11 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           packages: >
-            build-base
-            ccache
-            cmake
-            gfortran
-            m4
+            build-base 
             gmp-dev
             mpfr-dev
             lapack-dev
-            python3
-            util-linux-misc
-            autoconf
-            automake
-            libtool
+            util-linux-misc 
           # последнее на Alpine нужно только для lscpu, поэтому пришлось вернуть; но пока непонятно, прийдётся ли устанавливать что-то аналогичное на Ubuntu
           # ${{ matrix.arch != 'riscv64' && 'valgrind' || '' }}
           shell-name: alpine-target.sh
@@ -153,8 +146,6 @@ jobs:
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
 
       - name: build
-        env:
-          CROSS_SYSROOT: "/home/runner/rootfs/alpine-latest-${{ matrix.arch }}/usr"
         run: |
           # echo "gcc --version"
           # gcc --version
@@ -191,13 +182,12 @@ jobs:
       - name: check
         timeout-minutes: 60
         run: |
-          export PATH=$PATH:/home/runner/rootfs/alpine-latest-${{ matrix.arch }} 
           IFS=':'
           CHECK_LIBS="${CHECK_LIBS}${{ matrix.extra-check-libs }}"
           for lib in ${CHECK_LIBS}; do
             printf "::group::   \033[0;32m==>\033[0m Checking library \033[0;32m${lib}\033[0m\n"
             cd ${GITHUB_WORKSPACE}/${lib}
-            make demos CMAKE_OPTIONS="-DSUITESPARSE_DEMOS=ON -DBUILD_TESTING=ON"
+            make demos CMAKE_OPTIONS="-DSUITESPARSE_DEMOS=ON -DBUILD_TESTING=ON -DCMAKE_PREFIX_PATH=${CROSS_SYSROOT}"
             echo "::endgroup::"
           done
 
