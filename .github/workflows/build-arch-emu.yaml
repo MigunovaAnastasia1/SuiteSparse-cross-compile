@@ -74,9 +74,7 @@ jobs:
         # shell: bash
         run: |
           lscpu
-          apt show qemu-aarch64
-          apt show qemu
-
+         
       - name: checkout repository
         uses: actions/checkout@v4
         # shell: bash
@@ -105,6 +103,11 @@ jobs:
       - name: get CPU information (emulated)
         shell: alpine-target.sh {0}
         run: lscpu
+
+      - name: replace qemu
+        run: |
+          sudo apt qemu-user
+          sudo rm -f /usr/local/bin/qemu-aarch64
        
       - name: install cross-toolchain
         # shell: bash
