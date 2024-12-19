@@ -97,11 +97,8 @@ jobs:
       - name: check contents to look at set of shared libraries (but see all libraries)
         shell: alpine-target.sh {0}
         run: |
-          echo: "Contents of /usr/lib:"
           ls /usr/lib
-          echo: "Contents of /lib:"
           ls /lib
-          echo: "Contents of /usr/local/lib:"
           ls /usr/local/lib
 
       - name: get CPU information (emulated)
