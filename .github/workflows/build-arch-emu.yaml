@@ -102,7 +102,8 @@ jobs:
           make \
           ccache \
           automake \
-          libtool        
+          libtool \
+          qemu-user-binfmt        
           echo "::endgroup::"
 
       - name: checkout repository
@@ -238,19 +239,6 @@ jobs:
       - name: relocate ld
         run: |
          sudo cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
-
-      - name: configure binfmts 
-        # in order to execute target binary files on the host system
-        run: |
-         echo "::group::Installing qemu-${{ matrix.arch }} and binfmt-support"
-         sudo apt -y install \
-         qemu-${{ matrix.arch }} \
-         binfmt-support 
-         echo "::endgroup::" 
-         echo "::group::Expanding the binfmt registry with qemu-${{ matrix.arch }}"
-         sudo update-binfmts --import ${GITHUB_WORKSPACE}/binfmts/qemu-${{ matrix.arch }}
-         sudo update-binfmts --display
-         echo "::endgroup::"
   
       - name: check
         timeout-minutes: 60
