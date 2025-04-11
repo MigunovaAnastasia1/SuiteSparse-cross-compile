@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
 
       matrix:
-        # arch: [amd64, arm64, armv7, ppc64le, s390x, riscv64]
+        # arch: [amd64, arm64, armhf, ppc64le, s390x, riscv64]
         arch: [ arm64 ]
         include:
           #- arch: amd64
@@ -48,7 +48,7 @@ jobs:
             cxx: "aarch64-linux-gnu-g++-9"
             fc: "aarch64-linux-gnu-gfortran-10"
             ccache-max: 28M
-          #- arch: armv7
+          #- arch: armhf
           #  target_system: arm-linux-gnueabihf
           #  cross-toolchain: g++-9-arm-linux-gnueabihf
           #  fortran-cross-toolchain: gfortran-10-aarch64-linux-gnu
@@ -84,8 +84,11 @@ jobs:
     name: emulate (${{ matrix.arch }})
 
     env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+      FC: ${{ matrix.fc }}
       LD_LIBRARY_PATH: "/usr/${{ matrix.target_system }}/lib:/usr/lib/${{ matrix.target_system }}"
-      LIBRARY_PATH: "/usr/${{ matrix.target_system }}/lib:/usr/lib/${{ matrix.target_system }}"
+      LIBRARY_PATH: "/usr/${{ matrix.target_system }}/lib"
 
     steps:
       - name: get CPU information
@@ -99,7 +102,7 @@ jobs:
           make \
           ccache \
           automake \
-          libtool \       
+          libtool        
           echo "::endgroup::"
 
       - name: checkout repository
@@ -121,35 +124,40 @@ jobs:
         # https://manpages.ubuntu.com/manpages/noble/man5/sources.list.5.html
         run: |
           if [[ ${{ matrix.arch }} != 'x86' ]]
-          echo "::group::Configuring Multiarch for ${{ matrix.arch }}"
+          then
           sudo dpkg --add-architecture ${{ matrix.arch }}
-          sudo sh -c 'echo "Types: deb \
-                \nURIs: http://archive.ubuntu.com/ubuntu/ \
-                \nSuites: noble noble-updates noble-backports \
-                \nComponents: main restricted universe multiverse \
-                \nArchitectures: amd64 \
-                \nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg \
-                \n 
-                \nTypes: deb \
-                \nURIs: http://security.ubuntu.com/ubuntu/ \
-                \nSuites: noble-security \
-                \nComponents: main restricted universe multiverse \
-                \nArchitectures: amd64 \
-                \nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg \
-                \n 
-                \nTypes: deb \
-                \nURIs: http://ports.ubuntu.com/ubuntu-ports/ \
-                \nSuites: noble noble-updates noble-backports \
-                \nComponents: main restricted universe multiverse \
-                \nArchitectures: ${{ matrix.arch }} \
-                \nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg \
-                \n 
-                \nTypes: deb \
-                \nURIs: http://security.ports.ubuntu.com/ubuntu-ports/ \
-                \nSuites: noble-security \
-                \nComponents: main restricted universe multiverse \
-                \nArchitectures: ${{ matrix.arch }} \
-                \nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg" > /etc/apt/sources.list.d/ubuntu.sources'  
+          sudo bash -c 'cat - >/etc/apt/sources.list.d/ubuntu.sources' <<EOF
+          Types: deb
+          URIs: http://ru.archive.ubuntu.com/ubuntu/
+          Suites: noble noble-updates noble-backports
+          Components: main restricted universe multiverse
+          Architectures: amd64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          
+          Types: deb
+          URIs: http://security.ubuntu.com/ubuntu/
+          Suites: noble-security
+          Components: main restricted universe multiverse
+          Architectures: amd64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          
+          Types: deb
+          URIs: http://ru.ports.ubuntu.com/ubuntu-ports/
+          Suites: noble noble-updates noble-backports
+          Components: main restricted universe multiverse
+          Architectures: arm64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          
+          Types: deb
+          URIs: http://security.ports.ubuntu.com/ubuntu-ports/
+          Suites: noble-security
+          Components: main restricted universe multiverse
+          Architectures: arm64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          
+          EOF
+          echo "::group::Updating package indexes with new indexes for ${{ matrix.arch }} packages"
+          sudo apt update 
           echo "::endgroup::" 
           else
           echo "Target architecture is x86, Multiarch configuration isn't required."
@@ -227,7 +235,7 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: remove ld
+      - name: relocate ld
         run: |
          sudo cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
 
