@@ -13,4 +13,3 @@
 # dependencies for SuiteSparse build in the directory where  
 # the target environment is located
 
-set ( CMAKE_PREFIX_PATH $ENV{CROSS_SYSROOT} )
