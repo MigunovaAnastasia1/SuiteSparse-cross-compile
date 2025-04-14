@@ -33,13 +33,12 @@ jobs:
       fail-fast: false
 
       matrix:
-        # arch: [amd64, arm64, armhf, ppc64le, s390x, riscv64]
-        arch: [ arm64 ]
+        arch: [amd64, arm64, armhf, ppc64le, s390x, riscv64]
         include:
-          #- arch: amd64
-          #  ccache-max: 64M
-          #  extra-build-libs: ":GraphBLAS:LAGraph"
-          #  extra-check-libs: ":GraphBLAS:LAGraph"
+          - arch: amd64
+            ccache-max: 64M
+            extra-build-libs: ":GraphBLAS:LAGraph"
+            extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: arm64
             target_system: aarch64-linux-gnu
             cross-toolchain: g++-9-aarch64-linux-gnu
@@ -48,38 +47,38 @@ jobs:
             cxx: "aarch64-linux-gnu-g++-9"
             fc: "aarch64-linux-gnu-gfortran-10"
             ccache-max: 28M
-          #- arch: armhf
-          #  target_system: arm-linux-gnueabihf
-          #  cross-toolchain: g++-9-arm-linux-gnueabihf
-          #  fortran-cross-toolchain: gfortran-10-aarch64-linux-gnu
-          #  cc: "arm-linux-gnueabihf-gcc-9"
-          #  cxx: "arm-linux-gnueabihf-g++-9"
-          #  fc: "arm-linux-gnueabihf-gfortran-10"
-          #  ccache-max: 25M
-          #- arch: ppc64le
-          #  target_system: powerpc64le-linux-gnu
-          #  cross-toolchain: g++-9-powerpc64le-linux-gnu 
-          #  fortran-cross-toolchain: gfortran-10-powerpc64le-linux-gnu
-          #  cc: "powerpc64le-linux-gnu-gcc-9"
-          #  cxx: "powerpc64le-linux-gnu-g++-9"
-          #  fc: "powerpc64le-linux-gnu-gfortran-10"
-          #  ccache-max: 28M
-          #- arch: s390x
-          #  target_system: s390x-linux-gnu
-          #  cross-toolchain: g++-9-s390x-linux-gnu 
-          #  fortran-cross-toolchain: gfortran-10-s390x-linux-gnu
-          #  cc: "s390x-linux-gnu-gcc-9"
-          #  cxx: "s390x-linux-gnu-g++-9"
-          #  fc: "s390x-linux-gnu-gfortran-10"
-          #  ccache-max: 28M
-          #- arch: riscv64
-          #  target_system: riscv64-linux-gnu
-          #  cross-toolchain: g++-9-riscv64-linux-gnu 
-          #  fortran-cross-toolchain: gfortran-10-riscv64-linux-gnu
-          #  cc: "riscv64-linux-gnu-gcc-9"
-          #  cxx: "riscv64-linux-gnu-g++-9"
-          #  fc: "riscv64-linux-gnu-gfortran-10"
-          # ccache-max: 28M
+          - arch: armhf
+            target_system: arm-linux-gnueabihf
+            cross-toolchain: g++-9-arm-linux-gnueabihf
+            fortran-cross-toolchain: gfortran-10-aarch64-linux-gnu
+            cc: "arm-linux-gnueabihf-gcc-9"
+            cxx: "arm-linux-gnueabihf-g++-9"
+            fc: "arm-linux-gnueabihf-gfortran-10"
+            ccache-max: 25M
+          - arch: ppc64le
+            target_system: powerpc64le-linux-gnu
+            cross-toolchain: g++-9-powerpc64le-linux-gnu 
+            fortran-cross-toolchain: gfortran-10-powerpc64le-linux-gnu
+            cc: "powerpc64le-linux-gnu-gcc-9"
+            cxx: "powerpc64le-linux-gnu-g++-9"
+            fc: "powerpc64le-linux-gnu-gfortran-10"
+            ccache-max: 28M
+          - arch: s390x
+            target_system: s390x-linux-gnu
+            cross-toolchain: g++-9-s390x-linux-gnu 
+            fortran-cross-toolchain: gfortran-10-s390x-linux-gnu
+            cc: "s390x-linux-gnu-gcc-9"
+            cxx: "s390x-linux-gnu-g++-9"
+            fc: "s390x-linux-gnu-gfortran-10"
+            ccache-max: 28M
+          - arch: riscv64
+            target_system: riscv64-linux-gnu
+            cross-toolchain: g++-9-riscv64-linux-gnu 
+            fortran-cross-toolchain: gfortran-10-riscv64-linux-gnu
+            cc: "riscv64-linux-gnu-gcc-9"
+            cxx: "riscv64-linux-gnu-g++-9"
+            fc: "riscv64-linux-gnu-gfortran-10"
+           ccache-max: 28M
 
     name: emulate (${{ matrix.arch }})
 
