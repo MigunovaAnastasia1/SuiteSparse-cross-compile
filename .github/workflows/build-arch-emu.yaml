@@ -20,7 +20,7 @@ env:
 
 jobs:
 
-  cross-compile:
+  emulate:
     runs-on: ubuntu-latest
 
     defaults:
@@ -33,13 +33,13 @@ jobs:
       fail-fast: false
 
       matrix:
-        arch: [amd64, arm64, armhf, ppc64el, s390x, riscv64]
+        # arch: [amd64, arm64, armhf, ppc64le, s390x, riscv64]
+        arch: [ arm64 ]
         include:
-          - arch: amd64
-            cc: gcc
-            ccache-max: 64M
-            extra-build-libs: ":GraphBLAS:LAGraph"
-            extra-check-libs: ":GraphBLAS:LAGraph"
+          #- arch: amd64
+          #  ccache-max: 64M
+          #  extra-build-libs: ":GraphBLAS:LAGraph"
+          #  extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: arm64
             target_system: aarch64-linux-gnu
             cross-toolchain: g++-9-aarch64-linux-gnu
@@ -47,46 +47,41 @@ jobs:
             cc: "aarch64-linux-gnu-gcc-9"
             cxx: "aarch64-linux-gnu-g++-9"
             fc: "aarch64-linux-gnu-gfortran-10"
-            ld: ld-linux-aarch64.so.1
             ccache-max: 28M
-          - arch: armhf
-            target_system: arm-linux-gnueabihf
-            cross-toolchain: g++-9-arm-linux-gnueabihf
-            fortran-cross-toolchain: gfortran-10-arm-linux-gnueabihf
-            cc: "arm-linux-gnueabihf-gcc-9"
-            cxx: "arm-linux-gnueabihf-g++-9"
-            fc: "arm-linux-gnueabihf-gfortran-10"
-            ld: ld-linux.so.3
-            ccache-max: 25M
-          - arch: ppc64el
-            target_system: powerpc64le-linux-gnu
-            cross-toolchain: g++-9-powerpc64le-linux-gnu 
-            fortran-cross-toolchain: gfortran-10-powerpc64le-linux-gnu
-            cc: "powerpc64le-linux-gnu-gcc-9"
-            cxx: "powerpc64le-linux-gnu-g++-9"
-            fc: "powerpc64le-linux-gnu-gfortran-10"
-            ld: ld64.so.2
-            ccache-max: 28M
-          - arch: s390x
-            target_system: s390x-linux-gnu
-            cross-toolchain: g++-9-s390x-linux-gnu 
-            fortran-cross-toolchain: gfortran-10-s390x-linux-gnu
-            cc: "s390x-linux-gnu-gcc-9"
-            cxx: "s390x-linux-gnu-g++-9"
-            fc: "s390x-linux-gnu-gfortran-10"
-            ld: ld64.so.1
-            ccache-max: 28M
-          - arch: riscv64
-            target_system: riscv64-linux-gnu
-            cross-toolchain: g++-9-riscv64-linux-gnu 
-            fortran-cross-toolchain: gfortran-10-riscv64-linux-gnu
-            cc: "riscv64-linux-gnu-gcc-9"
-            cxx: "riscv64-linux-gnu-g++-9"
-            fc: "riscv64-linux-gnu-gfortran-10"
-            ld: ld-linux-riscv64-lp64d.so.1
-            ccache-max: 28M
+          #- arch: armhf
+          #  target_system: arm-linux-gnueabihf
+          #  cross-toolchain: g++-9-arm-linux-gnueabihf
+          #  fortran-cross-toolchain: gfortran-10-aarch64-linux-gnu
+          #  cc: "arm-linux-gnueabihf-gcc-9"
+          #  cxx: "arm-linux-gnueabihf-g++-9"
+          #  fc: "arm-linux-gnueabihf-gfortran-10"
+          #  ccache-max: 25M
+          #- arch: ppc64le
+          #  target_system: powerpc64le-linux-gnu
+          #  cross-toolchain: g++-9-powerpc64le-linux-gnu 
+          #  fortran-cross-toolchain: gfortran-10-powerpc64le-linux-gnu
+          #  cc: "powerpc64le-linux-gnu-gcc-9"
+          #  cxx: "powerpc64le-linux-gnu-g++-9"
+          #  fc: "powerpc64le-linux-gnu-gfortran-10"
+          #  ccache-max: 28M
+          #- arch: s390x
+          #  target_system: s390x-linux-gnu
+          #  cross-toolchain: g++-9-s390x-linux-gnu 
+          #  fortran-cross-toolchain: gfortran-10-s390x-linux-gnu
+          #  cc: "s390x-linux-gnu-gcc-9"
+          #  cxx: "s390x-linux-gnu-g++-9"
+          #  fc: "s390x-linux-gnu-gfortran-10"
+          #  ccache-max: 28M
+          #- arch: riscv64
+          #  target_system: riscv64-linux-gnu
+          #  cross-toolchain: g++-9-riscv64-linux-gnu 
+          #  fortran-cross-toolchain: gfortran-10-riscv64-linux-gnu
+          #  cc: "riscv64-linux-gnu-gcc-9"
+          #  cxx: "riscv64-linux-gnu-g++-9"
+          #  fc: "riscv64-linux-gnu-gfortran-10"
+          # ccache-max: 28M
 
-    name: cross-compile (${{ matrix.arch }})
+    name: emulate (${{ matrix.arch }})
 
     env:
       CC: ${{ matrix.cc }}
@@ -110,26 +105,24 @@ jobs:
           libtool \
           qemu-user-binfmt        
           echo "::endgroup::"
-
       - name: checkout repository
         uses: actions/checkout@v4
 
       - name: install cross-toolchain
         run: |
-          if [[ ${{ matrix.arch }} != 'amd64' ]]
+          if [[ ${{ matrix.arch }} != 'x86' ]]
           then
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
           sudo apt -y install ${{ matrix.cross-toolchain }} ${{ matrix.fortran-cross-toolchain }}       
           echo "::endgroup::"
           else 
-          echo "Target architecture is amd64, cross-compilation isn't required, cross-toolchain installation isn't required."
+          echo "Target architecture is x86, cross-compilation isn't required, cross-toolchain installation isn't required."
           fi
-
       - name: configure Multiarch
         # deb822-style format is a new format supported by apt itself since version 1.1:
         # https://manpages.ubuntu.com/manpages/noble/man5/sources.list.5.html
         run: |
-          if [[ ${{ matrix.arch }} != 'amd64' ]]
+          if [[ ${{ matrix.arch }} != 'x86' ]]
           then
           sudo dpkg --add-architecture ${{ matrix.arch }}
           sudo bash -c 'cat - >/etc/apt/sources.list.d/ubuntu.sources' <<EOF
@@ -151,14 +144,14 @@ jobs:
           URIs: http://ru.ports.ubuntu.com/ubuntu-ports/
           Suites: noble noble-updates noble-backports
           Components: main restricted universe multiverse
-          Architectures: ${{ matrix.arch }}
+          Architectures: arm64
           Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
           
           Types: deb
           URIs: http://security.ports.ubuntu.com/ubuntu-ports/
           Suites: noble-security
           Components: main restricted universe multiverse
-          Architectures: ${{ matrix.arch }}
+          Architectures: arm64
           Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
           
           EOF
@@ -166,9 +159,8 @@ jobs:
           sudo apt update 
           echo "::endgroup::" 
           else
-          echo "Target architecture is amd64, Multiarch configuration isn't required."
+          echo "Target architecture is x86, Multiarch configuration isn't required."
           fi
-
       - name: install cross-dependencies (using Multiarch)
         run: |
           echo "::group::Installing dependencies for target arch ${{ matrix.arch }}"
@@ -178,14 +170,12 @@ jobs:
           libopenblas-openmp-dev:${{ matrix.arch }} \
           libmpfr-dev:${{ matrix.arch }}
           echo "::endgroup::"
-
       - name: prepare ccache
         # create key with human readable timestamp
         # used in action/cache/restore and action/cache/save steps
         id: ccache-prepare
         run: |
-          echo "key=ccache:cross-compile:${{ matrix.arch }}:${{ github.ref }}:$(date +"%Y-%m-%d_%H-%M-%S"):${{ github.sha }}" >> $GITHUB_OUTPUT
-
+          echo "key=ccache:emulate:${{ matrix.arch }}:${{ github.ref }}:$(date +"%Y-%m-%d_%H-%M-%S"):${{ github.sha }}" >> $GITHUB_OUTPUT
       - name: restore ccache
         # setup the GitHub cache used to maintain the ccache from one job to the next
         uses: actions/cache/restore@v4
@@ -195,9 +185,8 @@ jobs:
           key: ${{ steps.ccache-prepare.outputs.key }}
           # Prefer caches from the same branch. Fall back to caches from the dev branch.
           restore-keys: |
-            ccache:cross-compile:${{ matrix.arch }}:${{ github.ref }}
-            ccache:cross-compile:${{ matrix.arch }}
-
+            ccache:emulate:${{ matrix.arch }}:${{ github.ref }}
+            ccache:emulate:${{ matrix.arch }}
       - name: configure ccache
         env:
           CCACHE_MAX: ${{ matrix.ccache-max }}
@@ -208,12 +197,11 @@ jobs:
           ccache -s
           which ccache
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
-
       - name: build
         run: |
-          echo "${{ matrix.cc }} --version"
+          echo "gcc --version"
           ${{ matrix.cc }} --version
-          echo "${{ matrix.cc }} -dumpmachine"
+          echo "gcc -dumpmachine"
           ${{ matrix.cc }} -dumpmachine
           IFS=:
           BUILD_LIBS="${BUILD_LIBS}${{ matrix.extra-build-libs }}"
@@ -240,16 +228,10 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
-
       - name: relocate ld
         run: |
-         if [[ ${{ matrix.arch }} != 'amd64' ]]
-         then 
-         ln -s /usr/${{ matrix.target_system }}/lib/${{ matrix.ld }} /lib
-         else
-         echo "Target architecture is amd64, cross-compilation isn't required, cross-toolchain installation isn't required."
-         fi
-
+         sudo cp /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
+  
       - name: check
         timeout-minutes: 60
         run: |
@@ -261,7 +243,6 @@ jobs:
             make demos CMAKE_OPTIONS="-DSUITESPARSE_DEMOS=ON -DBUILD_TESTING=ON"
             echo "::endgroup::"
           done
-
       - name: ccache status
         continue-on-error: true
         run: ccache -s
@@ -284,7 +265,6 @@ jobs:
             cmake --install .
             echo "::endgroup::"
           done
-
       - name: build example using CMake
         run: |
           #function fmax (from libm) needs linker flags
@@ -305,7 +285,6 @@ jobs:
           printf "\033[1;35m  C++ binary with shared libraries\033[0m\n"
           ./my_cxx_demo
           echo "::endgroup::"
-
       - name: test Config
         run: |
           IFS=:
@@ -320,7 +299,6 @@ jobs:
             cmake --build . --config Release
             echo "::endgroup::"
           done
-
       - name: build example using autotools
         run: |
           cd ${GITHUB_WORKSPACE}/Example
