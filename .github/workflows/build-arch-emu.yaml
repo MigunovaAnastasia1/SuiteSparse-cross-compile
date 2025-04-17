@@ -58,7 +58,7 @@ jobs:
             fc: "arm-linux-gnueabihf-gfortran-10"
             ld: ld-linux.so.3
             ccache-max: 25M
-          - arch: ppc64le
+          - arch: ppc64el
             target_system: powerpc64le-linux-gnu
             cross-toolchain: g++-9-powerpc64le-linux-gnu 
             fortran-cross-toolchain: gfortran-10-powerpc64le-linux-gnu
