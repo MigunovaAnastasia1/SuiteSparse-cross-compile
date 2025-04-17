@@ -241,15 +241,6 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: relocate ld
-        run: |
-         if [[ ${{ matrix.arch }} != 'amd64' ]]
-         then 
-         ln -s /usr/${{ matrix.target_system }}/lib/${{ matrix.ld }} /lib
-         else
-         echo "Target architecture is amd64, cross-compilation isn't required, cross-toolchain installation isn't required."
-         fi
-
       - name: check
         timeout-minutes: 60
         run: |
