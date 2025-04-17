@@ -173,8 +173,6 @@ jobs:
         run: |
           echo "::group::Installing dependencies for target arch ${{ matrix.arch }}"
           sudo apt -y install \
-          libblas-dev:${{ matrix.arch }} \
-          liblapack-dev:${{ matrix.arch }} \
           libopenblas-openmp-dev:${{ matrix.arch }} \
           libmpfr-dev:${{ matrix.arch }}
           echo "::endgroup::"
