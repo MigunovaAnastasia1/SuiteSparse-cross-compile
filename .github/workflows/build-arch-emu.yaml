@@ -1,11 +1,11 @@
 name: arch-emu
 on:
   workflow_dispatch:
-  # push:
-  # branches-ignore:
-  #    - '**/dev2'
-  #    - '**/*dev2'
-  # pull_request:
+  push:
+    branches-ignore:
+      - '**/dev2'
+      - '**/*dev2'
+  pull_request:
 
 concurrency: ci-arch-emu-${{ github.ref }}
 
@@ -33,16 +33,11 @@ jobs:
       fail-fast: false
 
       matrix:
-        arch: [amd64, arm64, armhf, ppc64el, s390x, riscv64]
+        arch: [amd64, armhf, ppc64el, s390x, riscv64]
         include:
           - arch: amd64
             cc: gcc
             ccache-max: 64M
-            extra-build-libs: ":GraphBLAS:LAGraph"
-            extra-check-libs: ":GraphBLAS:LAGraph"
-          - arch: arm64
-            cc: gcc
-            ccache-max: 60M
             extra-build-libs: ":GraphBLAS:LAGraph"
             extra-check-libs: ":GraphBLAS:LAGraph"
           - arch: armhf
@@ -91,16 +86,16 @@ jobs:
       - name: get CPU information
         run: lscpu
 
-      - name: install some aux utilities 
+      - name: install some aux utilities
         run: |
           echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
           sudo apt -y install \
-          cmake \
-          make \
-          ccache \
-          automake \
-          libtool \
-          qemu-user-binfmt        
+            cmake \
+            make \
+            ccache \
+            automake \
+            libtool \
+            qemu-user-binfmt
           echo "::endgroup::"
 
       - name: checkout repository
@@ -108,65 +103,63 @@ jobs:
 
       - name: install cross-toolchain
         run: |
-          if [[ ${{ matrix.arch }} != 'amd64' && ${{ matrix.arch }} != 'arm64' ]]
-          then
-          echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
-          sudo apt -y install ${{ matrix.cross-toolchain }} ${{ matrix.fortran-cross-toolchain }}       
-          echo "::endgroup::"
-          else 
-          echo "Target architecture is ${{ matrix.arch }}, cross-compilation isn't required, cross-toolchain installation isn't required."
+          if [[ ${{ matrix.arch }} != 'amd64' && ${{ matrix.arch }} != 'arm64' ]]; then
+            echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
+            sudo apt -y install ${{ matrix.cross-toolchain }} ${{ matrix.fortran-cross-toolchain }}
+            echo "::endgroup::"
+          else
+            echo "Target architecture is ${{ matrix.arch }}, cross-compilation isn't required, cross-toolchain installation isn't required."
           fi
 
       - name: configure Multiarch
         # deb822-style format is a new format supported by apt itself since version 1.1:
         # https://manpages.ubuntu.com/manpages/noble/man5/sources.list.5.html
         run: |
-          if [[ ${{ matrix.arch }} != 'amd64' && ${{ matrix.arch }} != 'arm64' ]]
-          then
-          sudo dpkg --add-architecture ${{ matrix.arch }}
-          sudo bash -c 'cat - >/etc/apt/sources.list.d/ubuntu.sources' <<EOF
-          Types: deb
-          URIs: http://ru.archive.ubuntu.com/ubuntu/
-          Suites: noble noble-updates noble-backports
-          Components: main restricted universe multiverse
-          Architectures: amd64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-          
-          Types: deb
-          URIs: http://security.ubuntu.com/ubuntu/
-          Suites: noble-security
-          Components: main restricted universe multiverse
-          Architectures: amd64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-          
-          Types: deb
-          URIs: http://ru.ports.ubuntu.com/ubuntu-ports/
-          Suites: noble noble-updates noble-backports
-          Components: main restricted universe multiverse
-          Architectures: ${{ matrix.arch }}
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-          
-          Types: deb
-          URIs: http://security.ports.ubuntu.com/ubuntu-ports/
-          Suites: noble-security
-          Components: main restricted universe multiverse
-          Architectures: ${{ matrix.arch }}
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-          
-          EOF
-          echo "::group::Updating package indexes with new indexes for ${{ matrix.arch }} packages"
-          sudo apt update 
-          echo "::endgroup::" 
+          if [[ ${{ matrix.arch }} != 'amd64' && ${{ matrix.arch }} != 'arm64' ]]; then
+            sudo dpkg --add-architecture ${{ matrix.arch }}
+            sudo bash -c 'cat - >/etc/apt/sources.list.d/ubuntu.sources' <<EOF
+            Types: deb
+            URIs: http://archive.ubuntu.com/ubuntu/
+            Suites: noble noble-updates noble-backports
+            Components: main restricted universe multiverse
+            Architectures: amd64
+            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+            
+            Types: deb
+            URIs: http://security.ubuntu.com/ubuntu/
+            Suites: noble-security
+            Components: main restricted universe multiverse
+            Architectures: amd64
+            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+            
+            Types: deb
+            URIs: http://ports.ubuntu.com/ubuntu-ports/
+            Suites: noble noble-updates noble-backports
+            Components: main restricted universe multiverse
+            Architectures: ${{ matrix.arch }}
+            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+            
+            Types: deb
+            URIs: http://security.ports.ubuntu.com/ubuntu-ports/
+            Suites: noble-security
+            Components: main restricted universe multiverse
+            Architectures: ${{ matrix.arch }}
+            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+            
+            EOF
+            echo "::group::Updating package indexes with new indexes for ${{ matrix.arch }} packages"
+            sudo apt update
+            echo "::endgroup::"
           else
-          echo "Target architecture is ${{ matrix.arch }}, Multiarch configuration isn't required."
+            echo "Target architecture is ${{ matrix.arch }}, Multiarch configuration isn't required."
           fi
 
       - name: install cross-dependencies (using Multiarch)
         run: |
           echo "::group::Installing dependencies for target arch ${{ matrix.arch }}"
           sudo apt -y install \
-          libopenblas-openmp-dev:${{ matrix.arch }} \
-          libmpfr-dev:${{ matrix.arch }}
+            libopenblas-openmp-dev:${{ matrix.arch }} \
+            libmpfr-dev:${{ matrix.arch }}
           echo "::endgroup::"
 
       - name: prepare ccache
@@ -196,6 +189,7 @@ jobs:
           echo "max_size = $CCACHE_MAX" >> ~/.ccache/ccache.conf
           echo "compression = true" >> ~/.ccache/ccache.conf
           ccache -s
+
           which ccache
           # echo "/usr/lib/ccache" >> $GITHUB_PATH
 
@@ -211,6 +205,7 @@ jobs:
             printf "   \033[0;32m==>\033[0m Building library \033[0;32m${lib}\033[0m\n"
             echo "::group::Configure $lib"
             cd ${GITHUB_WORKSPACE}/${lib}/build
+            PKG_CONFIG_PATH=/usr/lib/${{.matrix.target_system}}/pkgconfig/ \
             cmake -DCMAKE_BUILD_TYPE="Release" \
                   -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}" \
                   -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
@@ -247,7 +242,7 @@ jobs:
 
       - name: save ccache
         # Save the cache after we are done (successfully) building
-        # This helps to retain the ccache even if the subsequent steps are failing.
+        # This helps to retain the ccache even if the subsequent steps are failing
         uses: actions/cache/save@v4
         with:
           path: /home/runner/.ccache
