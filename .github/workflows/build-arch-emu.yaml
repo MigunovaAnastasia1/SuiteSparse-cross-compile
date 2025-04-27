@@ -117,36 +117,36 @@ jobs:
         run: |
           if [[ ${{ matrix.arch }} != 'amd64' && ${{ matrix.arch }} != 'arm64' ]]; then
             sudo dpkg --add-architecture ${{ matrix.arch }}
-            sudo bash -c 'cat - >/etc/apt/sources.list.d/ubuntu.sources' <<EOF
-            Types: deb
-            URIs: http://archive.ubuntu.com/ubuntu/
-            Suites: noble noble-updates noble-backports
-            Components: main restricted universe multiverse
-            Architectures: amd64
-            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-            
-            Types: deb
-            URIs: http://security.ubuntu.com/ubuntu/
-            Suites: noble-security
-            Components: main restricted universe multiverse
-            Architectures: amd64
-            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-            
-            Types: deb
-            URIs: http://ports.ubuntu.com/ubuntu-ports/
-            Suites: noble noble-updates noble-backports
-            Components: main restricted universe multiverse
-            Architectures: ${{ matrix.arch }}
-            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-            
-            Types: deb
-            URIs: http://security.ports.ubuntu.com/ubuntu-ports/
-            Suites: noble-security
-            Components: main restricted universe multiverse
-            Architectures: ${{ matrix.arch }}
-            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-            
-            EOF
+            sudo bash -c 'cat - >/etc/apt/sources.list.d/ubuntu.sources' <<-EOF
+          	Types: deb
+          	URIs: http://archive.ubuntu.com/ubuntu/
+          	Suites: noble noble-updates noble-backports
+          	Components: main restricted universe multiverse
+          	Architectures: amd64
+          	Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          	
+          	Types: deb
+          	URIs: http://security.ubuntu.com/ubuntu/
+          	Suites: noble-security
+          	Components: main restricted universe multiverse
+          	Architectures: amd64
+          	Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          	
+          	Types: deb
+          	URIs: http://ports.ubuntu.com/ubuntu-ports/
+          	Suites: noble noble-updates noble-backports
+          	Components: main restricted universe multiverse
+          Architectures: ${{ matrix.arch }}
+          	Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          	
+          	Types: deb
+          	URIs: http://security.ports.ubuntu.com/ubuntu-ports/
+          	Suites: noble-security
+          	Components: main restricted universe multiverse
+          	Architectures: ${{ matrix.arch }}
+          	Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          	
+          	EOF
             echo "::group::Updating package indexes with new indexes for ${{ matrix.arch }} packages"
             sudo apt update
             echo "::endgroup::"
