@@ -21,7 +21,7 @@ env:
 jobs:
 
   cross-compile:
-    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
 
     defaults:
       run:
@@ -103,7 +103,7 @@ jobs:
 
       - name: install cross-toolchain
         run: |
-          if [[ ${{ matrix.arch }} != 'amd64' && ${{ matrix.arch }} != 'arm64' ]]; then
+          if [[ ${{ matrix.arch }} != 'amd64' ]]; then
             echo "::group::Install cross-toolchain for ${{ matrix.arch }}"
             sudo apt -y install ${{ matrix.cross-toolchain }} ${{ matrix.fortran-cross-toolchain }}
             echo "::endgroup::"
@@ -115,7 +115,7 @@ jobs:
         # deb822-style format is a new format supported by apt itself since version 1.1:
         # https://manpages.ubuntu.com/manpages/noble/man5/sources.list.5.html
         run: |
-          if [[ ${{ matrix.arch }} != 'amd64' && ${{ matrix.arch }} != 'arm64' ]]; then
+          if [[ ${{ matrix.arch }} != 'amd64' ]]; then
             sudo dpkg --add-architecture ${{ matrix.arch }}
             sudo bash -c 'cat - >/etc/apt/sources.list.d/ubuntu.sources' <<-EOF
           	Types: deb
