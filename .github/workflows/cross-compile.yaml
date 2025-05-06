@@ -1,4 +1,4 @@
-name: arch-emu
+name: cross-compile
 on:
   workflow_dispatch:
   push:
